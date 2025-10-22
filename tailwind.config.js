@@ -24,7 +24,7 @@ module.exports = {
         foreground: "hsl(var(--foreground))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--foreground))",
+          foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -50,6 +50,17 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Brand colors
+        'celestial-blue': '#1E88E5',
+        'sunrise-gold': '#FBC02D',
+        'earth-clay': '#8D6E63',
+        'emerald-green': '#43A047',
+        'deep-indigo': '#283593',
+      },
+      fontFamily: {
+        sans: ['var(--font-source-sans)', 'Source Sans Pro', 'system-ui', 'sans-serif'],
+        heading: ['var(--font-montserrat)', 'Montserrat', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-playfair)', 'Playfair Display', 'Georgia', 'serif'],
       },
       borderRadius: {
         lg: "var(--radius)",
