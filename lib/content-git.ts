@@ -2,7 +2,7 @@ import fs from 'fs/promises'
 import path from 'path'
 import matter from 'gray-matter'
 import { compile } from '@mdx-js/mdx'
-import { Article, Video, StudyContent, ContentFrontmatter } from './types'
+import { Article, Video, StudyContent, ContentFrontmatter, StudyMetadata } from './types'
 
 const CONTENT_DIR = path.join(process.cwd(), 'content')
 
@@ -122,6 +122,44 @@ export async function getStudies(): Promise<string[]> {
       .map(dirent => dirent.name)
   } catch (error) {
     console.error('Error reading studies:', error)
+    return []
+  }
+}
+
+/**
+ * Get metadata for a specific study
+ */
+export async function getStudyMetadata(study: string): Promise<StudyMetadata | null> {
+  try {
+    const metadataPath = path.join(CONTENT_DIR, 'estudios', study, 'index.json')
+    const metadataContent = await fs.readFile(metadataPath, 'utf8')
+    return JSON.parse(metadataContent) as StudyMetadata
+  } catch (error) {
+    console.error(`Error reading study metadata for ${study}:`, error)
+    return null
+  }
+}
+
+/**
+ * Get metadata for all studies
+ */
+export async function getStudiesWithMetadata(): Promise<StudyMetadata[]> {
+  try {
+    const studies = await getStudies()
+    const metadata = await Promise.all(
+      studies.map(async (study) => {
+        const meta = await getStudyMetadata(study)
+        return meta || {
+          title: study.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
+          slug: study,
+          description: 'Un estudio bíblico para profundizar en tu fe.',
+        }
+      })
+    )
+    // Sort by order if provided
+    return metadata.sort((a, b) => (a.order || 999) - (b.order || 999))
+  } catch (error) {
+    console.error('Error reading studies with metadata:', error)
     return []
   }
 }

@@ -1,32 +1,45 @@
-# Proyecto Evangelio — Arquitectura y Configuración
-Propósito
 
-Sitio web en español para compartir el evangelio, videos de testimonio, artículos apologéticos y estudios bíblicos autoguiados.
 
-Infraestructura
-Componente	Tecnología	Descripción
-Framework	Next.js 15 (TypeScript, App Router)	SSR, ISR, Edge Middleware
-Estilos	Tailwind + shadcn/ui	Diseño limpio y responsivo
-Contenido	Archivos MDX (repositorio Git separado)	Artículos, videos y estudios
-Archivos binarios	Supabase Storage (content-assets)	Imágenes y documentos
-Base de datos	Supabase Postgres	Eventos, contactos, progreso, banderas
-Video	YouTube	Embeds en MDX
-Chat	Chatwoot	Chat con equipos locales
-Analítica	Google Analytics 4	Medición de tráfico
-Hosting	Vercel	Edge + ISR
-Estructura de contenido
+# Project Overview — Evangelistic Website
 
+## Purpose:
+A Spanish-language website to share the gospel, host video testimonies, apologetics articles, and self-paced Bible studies.
+
+## Infrastructure Overview:
+Framework: Next.js 15 (TypeScript, App Router)
+Styling: TailwindCSS + shadcn/ui
+Content: MDX files stored in a separate Git repository (articles, videos, and studies)
+Media Storage: Supabase Storage (bucket name: content-assets) for images, thumbnails, and documents
+Database: Supabase Postgres for events, contacts, study progress, and feature flags
+Video: YouTube embedded within MDX
+Chat: Chatwoot for regional chat support by country/city
+Analytics: Google Analytics 4
+Hosting: Vercel with Edge runtime and ISR caching
+
+## Content Structure:
+Content lives in a Git submodule or separate repo mounted at /content
 /content
- /articulos/.mdx
- /videos/.mdx
- /estudios/<study>/*.mdx
- /index.json
+/articulos/.mdx
+/videos/.mdx
+/estudios/<study>/*.mdx
+/index.json
 
-Imágenes y recursos viven en:
-Supabase Storage → content-assets/
+Images and related media live in Supabase Storage under:
+content-assets/
 
-Variables de entorno
+Example layout:
+content-assets/articulos/<slug>/cover.jpg
+content-assets/videos/<slug>/thumb.jpg
+content-assets/estudios/<study>/<lesson>.jpg
 
+Each MDX file includes YAML front-matter such as:
+title: "¿Quién es Jesús?"
+date: "2025-01-12"
+cover: "https://your-supabase-url/storage/v1/object/public/content-assets/articulos/jesus/cover.jpg
+"
+tags: ["evangelio"]
+
+## Environment Variables:
 NEXT_PUBLIC_SITE_URL=
 GA_MEASUREMENT_ID=
 SUPABASE_URL=
@@ -37,58 +50,81 @@ CHATWOOT_TOKEN=
 CHATWOOT_BASE_URL=
 FEATURE_FLAGS_CACHE_SECONDS=300
 
-Tablas clave
+## Database Schema (for Supabase):
+regions table: country_code, country_name
+cities table: id, country_code, city_name
+events table: id, title, description, starts_at, country_code, city_id, venue, url, published
+contacts table: id, country_code, city_id, channel_type, value
+study_progress table: id, anon_id, study_id, lesson_id, step, completed_at
+feature_flags table: key, enabled, country_code, notes
 
-regions, cities, events, contacts
+## Feature Flags:
+Used to enable or disable parts of the site without code changes.
+Stored in Supabase table feature_flags and cached server-side.
 
-study_progress
+### Flags:
+reminders - OFF - future reminders or emails
+buddy - OFF - study buddy feature
+events - ON - show /eventos page
+help - ON - show /encuentra-ayuda page
 
-feature_flags
+### Example usage:
+if (isEnabled('events')) { render events section }
 
-Geolocalización
+## Country and Region Handling:
+Edge middleware reads req.geo.country and sets a cookie named cc.
+Components and database queries filter by cc.
+User can manually change country using CountrySwitcher.
+No automatic redirects based on country.
 
-Middleware establece cookie cc por país.
+## Development Workflow:
 
-Componentes filtran contenido según esa cookie.
+Clone the application repository.
 
-Banderas de funciones
-Clave	Estado inicial	Descripción
-reminders	OFF	Recordatorios futuros
-buddy	OFF	Compañeros de estudio
-events	ON	Página de eventos
-help	ON	Página de ayuda
-Flujo de desarrollo
+Add the content repository as a Git submodule at /content.
 
-Clonar repo de aplicación.
+Configure environment variables in .env.local.
 
-Añadir repo de contenido como submódulo /content.
+Run "pnpm dev" to start the local server.
 
-Configurar .env.local.
+Upload images and assets to Supabase Storage.
 
-Ejecutar pnpm dev.
+Deploy to Vercel.
 
-Subir imágenes a Supabase Storage.
+## Deployment Notes:
 
-Desplegar en Vercel.
+Site should work even when advanced features are off.
 
-Criterios de aceptación
+Google Analytics should log page views.
 
-El sitio carga en español con cookie cc creada.
+Country cookie cc should be set automatically.
 
-Contenido MDX renderizado desde Git.
+MDX renders from Git content.
 
-Imágenes cargadas desde Supabase Storage.
+Images load from Supabase Storage.
 
-Eventos y contactos filtrados por país.
+Chatwoot receives country and city attributes.
 
-Banderas desactivadas no rompen UI.
+## Future Expansion:
 
-Chatwoot muestra atributos de país/ciudad.
+Add CMS integration (like Sanity) if multiple content editors are needed.
 
-GA4 registra visitas.
+Enable reminder or buddy systems by flipping feature flags.
 
-Migración futura
+Add Supabase webhooks for content revalidation if desired.
 
-Si se necesitan editores no técnicos, migrar contenido MDX a CMS (Sanity).
+## Acceptance Checklist:
 
-Activar recordatorios y funciones sociales habilitando banderas.
+Site loads in Spanish and sets cc cookie.
+
+MDX content renders correctly.
+
+Images load from Supabase URLs.
+
+Local events and contacts display by country.
+
+Disabled flags hide features without breaking layout.
+
+Chatwoot loads correctly with attributes.
+
+Google Analytics 4 records page views.

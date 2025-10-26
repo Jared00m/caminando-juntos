@@ -1,11 +1,57 @@
 import { getArticle } from '@/lib/content-git'
 import { MDXRenderer } from '@/components/mdx/MDXRenderer'
 import { notFound } from 'next/navigation'
+import { Metadata } from 'next'
+import { ArticleStructuredData, BreadcrumbStructuredData } from '@/components/StructuredData'
 
 interface ArticlePageProps {
   params: Promise<{
     slug: string
   }>
+}
+
+export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
+  const { slug } = await params
+  const article = await getArticle(slug)
+
+  if (!article) {
+    return {
+      title: 'Artículo no encontrado',
+    }
+  }
+
+  return {
+    title: `${article.title} | Dios Habla`,
+    description: article.description || `Lee ${article.title} en Dios Habla - artículos que inspiran fe.`,
+    keywords: article.tags || ['artículo cristiano', 'fe', 'evangelio'],
+    authors: article.author ? [{ name: article.author }] : [{ name: 'Dios Habla' }],
+    openGraph: {
+      type: 'article',
+      locale: 'es_ES',
+      url: `https://dioshabla.org/articulos/${slug}`,
+      title: article.title,
+      description: article.description || '',
+      siteName: 'Dios Habla',
+      publishedTime: article.date,
+      authors: article.author ? [article.author] : ['Dios Habla'],
+      tags: article.tags,
+      images: article.cover ? [{
+        url: article.cover,
+        width: 1200,
+        height: 630,
+        alt: article.title,
+      }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: article.title,
+      description: article.description || '',
+      images: article.cover ? [article.cover] : [],
+    },
+    alternates: {
+      canonical: `https://dioshabla.org/articulos/${slug}`,
+    },
+  }
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
@@ -18,6 +64,21 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <ArticleStructuredData
+        title={article.title}
+        description={article.description || ''}
+        datePublished={article.date}
+        author={article.author || 'Dios Habla'}
+        image={article.cover}
+        url={`https://dioshabla.org/articulos/${slug}`}
+      />
+      <BreadcrumbStructuredData
+        items={[
+          { name: 'Inicio', url: 'https://dioshabla.org' },
+          { name: 'Artículos', url: 'https://dioshabla.org/articulos' },
+          { name: article.title, url: `https://dioshabla.org/articulos/${slug}` },
+        ]}
+      />
       <article className="max-w-4xl mx-auto">
         {/* Header */}
         <header className="mb-8">

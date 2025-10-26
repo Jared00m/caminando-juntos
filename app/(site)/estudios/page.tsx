@@ -1,8 +1,9 @@
-import { getStudies } from '@/lib/content-git'
+import { getStudiesWithMetadata } from '@/lib/content-git'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default async function StudiesPage() {
-  const studies = await getStudies()
+  const studies = await getStudiesWithMetadata()
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -29,30 +30,58 @@ export default async function StudiesPage() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {studies.map((study) => (
             <Link
-              key={study}
-              href={`/estudios/${study}`}
-              className="group border border-border rounded-2xl p-8 hover:shadow-xl transition-all bg-white hover:scale-105"
+              key={study.slug}
+              href={`/estudios/${study.slug}`}
+              className="group border border-border rounded-2xl overflow-hidden hover:shadow-xl transition-all bg-white hover:scale-105"
             >
-              <div className="flex items-center mb-6">
-                <div className="w-16 h-16 bg-gradient-to-br from-emerald-green to-celestial-blue rounded-2xl flex items-center justify-center mr-4 shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.832 18.477 19.246 18 17.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              {/* Thumbnail Image */}
+              {study.thumbnail && (
+                <div className="relative w-full h-48 bg-gradient-to-br from-celestial-blue/10 to-emerald-green/10">
+                  <Image
+                    src={study.thumbnail}
+                    alt={study.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                </div>
+              )}
+              
+              <div className="p-8">
+                <div className="flex items-center mb-4">
+                  <h2 className="text-2xl font-semibold text-deep-indigo group-hover:text-celestial-blue transition-colors">
+                    {study.title}
+                  </h2>
+                </div>
+                
+                <p className="text-muted-foreground mb-6 leading-relaxed">
+                  {study.description}
+                </p>
+                
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {study.level && (
+                    <span className="bg-celestial-blue/10 text-celestial-blue px-3 py-1 rounded-full text-xs font-medium">
+                      {study.level}
+                    </span>
+                  )}
+                  {study.lessons && (
+                    <span className="bg-emerald-green/10 text-emerald-green px-3 py-1 rounded-full text-xs font-medium">
+                      {study.lessons} lecciones
+                    </span>
+                  )}
+                  {study.estimatedTime && (
+                    <span className="bg-sunrise-gold/10 text-sunrise-gold px-3 py-1 rounded-full text-xs font-medium">
+                      {study.estimatedTime}
+                    </span>
+                  )}
+                </div>
+                
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-celestial-blue font-semibold">Ver lecciones</span>
+                  <svg className="w-5 h-5 text-celestial-blue group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </div>
-                <h2 className="text-2xl font-semibold text-deep-indigo group-hover:text-celestial-blue transition-colors capitalize">
-                  {study.replace(/-/g, ' ')}
-                </h2>
-              </div>
-              
-              <p className="text-muted-foreground mb-6 leading-relaxed">
-                Un estudio profundo que te ayudará a entender mejor las verdades fundamentales de la fe cristiana.
-              </p>
-              
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-celestial-blue font-semibold">Ver lecciones</span>
-                <svg className="w-5 h-5 text-celestial-blue group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
               </div>
             </Link>
           ))}
@@ -68,10 +97,10 @@ export default async function StudiesPage() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href="/estudios/conociendo-a-jesus"
+            href="/estudios/el-plan-de-salvacion"
             className="inline-flex items-center justify-center px-8 py-4 border-2 border-transparent text-base font-semibold rounded-lg text-white bg-celestial-blue hover:bg-celestial-blue/90 shadow-lg hover:shadow-xl hover:scale-105 transition-all"
           >
-            Comenzar con "Conociendo a Jesús"
+            Comenzar con "El Plan de Salvación"
           </Link>
           <Link
             href="/articulos"

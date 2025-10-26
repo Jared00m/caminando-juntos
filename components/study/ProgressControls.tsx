@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { v4 as uuidv4 } from 'uuid'
-import Cookies from 'js-cookie'
+import { useAuth } from '@/lib/auth-context'
 
 interface ProgressControlsProps {
   step: number
@@ -11,19 +10,27 @@ interface ProgressControlsProps {
 }
 
 export function ProgressControls({ step, studyId, lessonId }: ProgressControlsProps) {
+  const { userId, isAuthenticated } = useAuth()
   const [isCompleted, setIsCompleted] = useState(false)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     checkProgress()
-  }, [step, studyId, lessonId])
+  }, [step, studyId, lessonId, userId])
 
   const checkProgress = async () => {
     if (!studyId || !lessonId) return
 
     try {
-      const anonId = getOrCreateAnonId()
-      const response = await fetch(`/api/study-progress?anonId=${anonId}&studyId=${studyId}&lessonId=${lessonId}&step=${step}`)
+      const params = new URLSearchParams({
+        userId,
+        isAuthenticated: isAuthenticated.toString(),
+        studyId,
+        lessonId,
+        step: step.toString(),
+      })
+      
+      const response = await fetch(`/api/study-progress?${params}`)
       const data = await response.json()
       setIsCompleted(data.completed)
     } catch (error) {
@@ -36,14 +43,14 @@ export function ProgressControls({ step, studyId, lessonId }: ProgressControlsPr
 
     setLoading(true)
     try {
-      const anonId = getOrCreateAnonId()
       const response = await fetch('/api/study-progress', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          anonId,
+          userId,
+          isAuthenticated,
           studyId,
           lessonId,
           step,
@@ -58,15 +65,6 @@ export function ProgressControls({ step, studyId, lessonId }: ProgressControlsPr
     } finally {
       setLoading(false)
     }
-  }
-
-  const getOrCreateAnonId = (): string => {
-    let anonId = Cookies.get('anon_id')
-    if (!anonId) {
-      anonId = uuidv4()
-      Cookies.set('anon_id', anonId, { expires: 365 }) // 1 year
-    }
-    return anonId
   }
 
   return (

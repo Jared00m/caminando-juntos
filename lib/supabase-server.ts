@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { Region, City, Event, Contact, StudyProgress, FeatureFlag } from './types'
 
 const supabaseUrl = process.env.SUPABASE_URL
@@ -8,12 +8,26 @@ if (!supabaseUrl || !supabaseKey) {
   console.warn('Supabase environment variables not configured. Some features may not work.')
 }
 
-export const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey, {
+export const supabase = supabaseUrl && supabaseKey ? createSupabaseClient(supabaseUrl, supabaseKey, {
   auth: {
     autoRefreshToken: false,
     persistSession: false,
   },
 }) : null
+
+// Create server-side Supabase client
+export async function createClient() {
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error('Supabase environment variables not configured')
+  }
+  
+  return createSupabaseClient(supabaseUrl, supabaseKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  })
+}
 
 // Client-side Supabase for public operations
 export const createClientSupabase = () => {
@@ -25,7 +39,7 @@ export const createClientSupabase = () => {
     return null
   }
   
-  return createClient(url, key)
+  return createSupabaseClient(url, key)
 }
 
 // Region functions

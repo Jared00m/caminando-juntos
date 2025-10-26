@@ -2,6 +2,10 @@ import { Metadata } from 'next'
 import '../styles/globals.css'
 import { Analytics } from '@/components/Analytics'
 import { ChatwootWidget } from '@/components/ChatwootWidget'
+import { AuthProvider } from '@/lib/auth-context'
+import { AuthButton } from '@/components/AuthButton'
+import { AuthErrorHandler } from '@/components/AuthErrorHandler'
+import { Suspense } from 'react'
 
 export const metadata: Metadata = {
   title: 'Dios Habla - Conoce a Jesús',
@@ -9,12 +13,42 @@ export const metadata: Metadata = {
   keywords: ['Jesús', 'evangelio', 'estudios bíblicos', 'fe cristiana', 'español'],
   authors: [{ name: 'Dios Habla' }],
   creator: 'Dios Habla',
+  metadataBase: new URL('https://dioshabla.org'),
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
     type: 'website',
     locale: 'es_ES',
+    url: 'https://dioshabla.org',
     title: 'Dios Habla - Conoce a Jesús',
     description: 'Descubre quién es Jesús a través de estudios bíblicos, artículos y recursos espirituales en español.',
     siteName: 'Dios Habla',
+    images: [
+      {
+        url: '/logo.png',
+        width: 1200,
+        height: 630,
+        alt: 'Dios Habla',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Dios Habla - Conoce a Jesús',
+    description: 'Descubre quién es Jesús a través de estudios bíblicos, artículos y recursos espirituales en español.',
+    images: ['/logo.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 }
 
@@ -29,16 +63,20 @@ export default function RootLayout({
         <Analytics />
       </head>
       <body className="min-h-screen bg-background font-sans antialiased">
-        <div className="relative flex min-h-screen flex-col">
+        <AuthProvider>
+          <Suspense fallback={null}>
+            <AuthErrorHandler />
+          </Suspense>
+          <div className="relative flex min-h-screen flex-col">
           <header className="sticky top-0 z-40 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 shadow-sm">
             <div className="container flex h-16 items-center">
               <div className="mr-4 hidden md:flex">
-                <a className="mr-8 flex items-center space-x-2 group" href="/">
-                  <div className="w-8 h-8 bg-gradient-to-br from-celestial-blue to-sunrise-gold rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-                    <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
-                    </svg>
-                  </div>
+                <a className="mr-8 flex items-center space-x-3 group" href="/">
+                  <img 
+                    src="/logo.png" 
+                    alt="Dios Habla" 
+                    className="h-10 w-auto group-hover:scale-105 transition-transform"
+                  />
                   <span className="hidden font-bold text-xl sm:inline-block bg-gradient-to-r from-celestial-blue to-deep-indigo bg-clip-text text-transparent">
                     Dios Habla
                   </span>
@@ -65,6 +103,7 @@ export default function RootLayout({
                 </nav>
               </div>
               <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+                <AuthButton />
                 <div className="w-full flex-1 md:w-auto md:flex-none">
                   {/* Country switcher will go here */}
                 </div>
@@ -101,6 +140,7 @@ export default function RootLayout({
           </footer>
         </div>
         <ChatwootWidget />
+        </AuthProvider>
       </body>
     </html>
   )

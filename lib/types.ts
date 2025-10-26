@@ -85,3 +85,15 @@ export interface StudyContent extends ContentFrontmatter {
   order?: number
   steps?: number
 }
+
+export interface StudyMetadata {
+  title: string
+  slug: string
+  description: string
+  level?: string
+  lessons?: number
+  estimatedTime?: string
+  tags?: string[]
+  thumbnail?: string
+  order?: number
+}
