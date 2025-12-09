@@ -10,6 +10,7 @@ interface AuthContextType {
   user: User | null
   userId: string // Either auth.uid() or anon_id
   isAuthenticated: boolean
+  isAdmin: boolean
   isLoading: boolean
   signIn: (email: string, password: string) => Promise<void>
   signUp: (email: string, password: string, displayName?: string) => Promise<void>
@@ -20,6 +21,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const supabase = createClient()
 
@@ -36,21 +38,69 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const userId = user?.id || getOrCreateAnonId()
   const isAuthenticated = !!user
 
-  useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
-      setIsLoading(false)
-    })
+  const checkAdmin = async (currentUser: User | null) => {
 
-    // Listen for auth changes
+    console.log('Checking admin status for user:', currentUser)
+    if (!currentUser) {
+      setIsAdmin(false)
+      return
+    }
+
+    try {
+      console.log('Fetching user role for user ID:', currentUser.id)
+      const { data, error } = await supabase.rpc('get_user_role', { user_id: currentUser.id })
+      console.log('User role data:', data, 'Error:', error)
+
+      if (error) {
+        console.error('Failed to fetch user role:', error)
+        setIsAdmin(false)
+        return
+      }
+
+      setIsAdmin(data?.role === 'admin')
+    } catch (err) {
+      console.error('Unexpected error fetching user role:', err)
+      setIsAdmin(false)
+    }
+  }
+
+  useEffect(() => {
+    let isMounted = true
+
+    const initSession = async () => {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession()
+
+        if (!isMounted) return
+
+        setUser(session?.user ?? null)
+        // await checkAdmin(session?.user ?? null)
+      } catch (err) {
+        console.error('Error initializing session:', err)
+      } finally {
+        if (isMounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    initSession()
+
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!isMounted) return
+
       setUser(session?.user ?? null)
+      await checkAdmin(session?.user ?? null)
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      isMounted = false
+      subscription.unsubscribe()
+    }
   }, [])
 
   const signIn = async (email: string, password: string) => {
@@ -78,8 +128,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut()
-    if (error) throw error
+    setIsLoading(true)
+    try {
+      const { error } = await supabase.auth.signOut()
+      if (error) throw error
+
+      setUser(null)
+      setIsAdmin(false)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -88,6 +146,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         userId,
         isAuthenticated,
+        isAdmin,
         isLoading,
         signIn,
         signUp,

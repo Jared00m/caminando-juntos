@@ -9,18 +9,31 @@ const CONTENT_DIR = path.join(process.cwd(), 'content')
 /**
  * Get all articles from the content directory
  */
-export async function getArticles(): Promise<Article[]> {
+export async function getArticles(locale: string = 'es'): Promise<Article[]> {
   try {
     const articlesDir = path.join(CONTENT_DIR, 'articulos')
     const files = await fs.readdir(articlesDir)
-    const mdxFiles = files.filter(file => file.endsWith('.mdx'))
+    // Filter for default locale files to get the base list
+    const mdxFiles = files.filter(file => file.endsWith('.mdx') && !file.includes('.pt.mdx'))
     
     const articles = await Promise.all(
       mdxFiles.map(async (file) => {
-        const fullPath = path.join(articlesDir, file)
+        const slug = file.replace('.mdx', '')
+        // Try to find localized version
+        let filename = file
+        if (locale !== 'es') {
+          const localizedFile = `${slug}.${locale}.mdx`
+          try {
+            await fs.access(path.join(articlesDir, localizedFile))
+            filename = localizedFile
+          } catch (e) {
+            // Fallback to default
+          }
+        }
+
+        const fullPath = path.join(articlesDir, filename)
         const fileContent = await fs.readFile(fullPath, 'utf8')
         const { data, content } = matter(fileContent)
-        const slug = file.replace('.mdx', '')
         
         return {
           slug,
@@ -41,9 +54,22 @@ export async function getArticles(): Promise<Article[]> {
 /**
  * Get a single article by slug
  */
-export async function getArticle(slug: string): Promise<Article | null> {
+export async function getArticle(slug: string, locale: string = 'es'): Promise<Article | null> {
   try {
-    const filePath = path.join(CONTENT_DIR, 'articulos', `${slug}.mdx`)
+    const articlesDir = path.join(CONTENT_DIR, 'articulos')
+    let filename = `${slug}.mdx`
+    
+    if (locale !== 'es') {
+      const localizedFile = `${slug}.${locale}.mdx`
+      try {
+        await fs.access(path.join(articlesDir, localizedFile))
+        filename = localizedFile
+      } catch (e) {
+        // Fallback to default
+      }
+    }
+
+    const filePath = path.join(articlesDir, filename)
     const fileContent = await fs.readFile(filePath, 'utf8')
     const { data, content } = matter(fileContent)
     
@@ -61,18 +87,31 @@ export async function getArticle(slug: string): Promise<Article | null> {
 /**
  * Get all videos from the content directory
  */
-export async function getVideos(): Promise<Video[]> {
+export async function getVideos(locale: string = 'es'): Promise<Video[]> {
   try {
     const videosDir = path.join(CONTENT_DIR, 'videos')
     const files = await fs.readdir(videosDir)
-    const mdxFiles = files.filter(file => file.endsWith('.mdx'))
+    // Filter for default locale files to get the base list
+    const mdxFiles = files.filter(file => file.endsWith('.mdx') && !file.includes('.pt.mdx'))
     
     const videos = await Promise.all(
       mdxFiles.map(async (file) => {
-        const fullPath = path.join(videosDir, file)
+        const slug = file.replace('.mdx', '')
+        // Try to find localized version
+        let filename = file
+        if (locale !== 'es') {
+          const localizedFile = `${slug}.${locale}.mdx`
+          try {
+            await fs.access(path.join(videosDir, localizedFile))
+            filename = localizedFile
+          } catch (e) {
+            // Fallback to default
+          }
+        }
+
+        const fullPath = path.join(videosDir, filename)
         const fileContent = await fs.readFile(fullPath, 'utf8')
         const { data, content } = matter(fileContent)
-        const slug = file.replace('.mdx', '')
         
         return {
           slug,
@@ -93,9 +132,22 @@ export async function getVideos(): Promise<Video[]> {
 /**
  * Get a single video by slug
  */
-export async function getVideo(slug: string): Promise<Video | null> {
+export async function getVideo(slug: string, locale: string = 'es'): Promise<Video | null> {
   try {
-    const filePath = path.join(CONTENT_DIR, 'videos', `${slug}.mdx`)
+    const videosDir = path.join(CONTENT_DIR, 'videos')
+    let filename = `${slug}.mdx`
+    
+    if (locale !== 'es') {
+      const localizedFile = `${slug}.${locale}.mdx`
+      try {
+        await fs.access(path.join(videosDir, localizedFile))
+        filename = localizedFile
+      } catch (e) {
+        // Fallback to default
+      }
+    }
+
+    const filePath = path.join(videosDir, filename)
     const fileContent = await fs.readFile(filePath, 'utf8')
     const { data, content } = matter(fileContent)
     
@@ -129,9 +181,22 @@ export async function getStudies(): Promise<string[]> {
 /**
  * Get metadata for a specific study
  */
-export async function getStudyMetadata(study: string): Promise<StudyMetadata | null> {
+export async function getStudyMetadata(study: string, locale: string = 'es'): Promise<StudyMetadata | null> {
   try {
-    const metadataPath = path.join(CONTENT_DIR, 'estudios', study, 'index.json')
+    const studyDir = path.join(CONTENT_DIR, 'estudios', study)
+    let filename = 'index.json'
+    
+    if (locale !== 'es') {
+      const localizedFile = `index.${locale}.json`
+      try {
+        await fs.access(path.join(studyDir, localizedFile))
+        filename = localizedFile
+      } catch (e) {
+        // Fallback
+      }
+    }
+
+    const metadataPath = path.join(studyDir, filename)
     const metadataContent = await fs.readFile(metadataPath, 'utf8')
     return JSON.parse(metadataContent) as StudyMetadata
   } catch (error) {
@@ -143,12 +208,12 @@ export async function getStudyMetadata(study: string): Promise<StudyMetadata | n
 /**
  * Get metadata for all studies
  */
-export async function getStudiesWithMetadata(): Promise<StudyMetadata[]> {
+export async function getStudiesWithMetadata(locale: string = 'es'): Promise<StudyMetadata[]> {
   try {
     const studies = await getStudies()
     const metadata = await Promise.all(
       studies.map(async (study) => {
-        const meta = await getStudyMetadata(study)
+        const meta = await getStudyMetadata(study, locale)
         return meta || {
           title: study.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
           slug: study,
@@ -167,63 +232,87 @@ export async function getStudiesWithMetadata(): Promise<StudyMetadata[]> {
 /**
  * Get all lessons for a specific study
  */
-export async function getStudyLessons(study: string): Promise<StudyContent[]> {
+export async function getStudyLessons(study: string, locale: string = 'es'): Promise<StudyContent[]> {
   try {
     const studyDir = path.join(CONTENT_DIR, 'estudios', study)
     const files = await fs.readdir(studyDir)
-    const mdxFiles = files.filter(file => file.endsWith('.mdx'))
+    // Filter for default locale files to get the base list
+    const mdxFiles = files.filter(file => file.endsWith('.mdx') && !file.includes('.pt.mdx'))
     
     const lessons = await Promise.all(
       mdxFiles.map(async (file) => {
-        const fullPath = path.join(studyDir, file)
+        const lessonSlug = file.replace('.mdx', '')
+        
+        // Try to find localized version
+        let filename = file
+        if (locale !== 'es') {
+          const localizedFile = `${lessonSlug}.${locale}.mdx`
+          try {
+            await fs.access(path.join(studyDir, localizedFile))
+            filename = localizedFile
+          } catch (e) {
+            // Fallback
+          }
+        }
+
+        const fullPath = path.join(studyDir, filename)
         const fileContent = await fs.readFile(fullPath, 'utf8')
         const { data, content } = matter(fileContent)
-        const lesson = file.replace('.mdx', '')
         
         return {
-          slug: lesson,
-          study,
-          lesson,
+          slug: lessonSlug,
           content,
+          study,
+          lesson: lessonSlug,
           ...data,
         } as StudyContent
       })
     )
     
-    // Sort by order if provided, otherwise by filename
-    return lessons.sort((a, b) => {
-      if (a.order && b.order) {
-        return a.order - b.order
-      }
-      return a.lesson.localeCompare(b.lesson)
-    })
+    // Sort by order or lesson number
+    return lessons.sort((a, b) => (a.order || 0) - (b.order || 0))
   } catch (error) {
-    console.error(`Error reading study lessons for ${study}:`, error)
+    console.error(`Error reading lessons for study ${study}:`, error)
     return []
   }
 }
 
 /**
- * Get a specific lesson from a study
+ * Get a single lesson
  */
-export async function getStudyLesson(study: string, lesson: string): Promise<StudyContent | null> {
+export async function getStudyLesson(study: string, lesson: string, locale: string = 'es'): Promise<StudyContent | null> {
   try {
-    const filePath = path.join(CONTENT_DIR, 'estudios', study, `${lesson}.mdx`)
+    const studyDir = path.join(CONTENT_DIR, 'estudios', study)
+    let filename = `${lesson}.mdx`
+    
+    if (locale !== 'es') {
+      const localizedFile = `${lesson}.${locale}.mdx`
+      try {
+        await fs.access(path.join(studyDir, localizedFile))
+        filename = localizedFile
+      } catch (e) {
+        // Fallback
+      }
+    }
+
+    const filePath = path.join(studyDir, filename)
     const fileContent = await fs.readFile(filePath, 'utf8')
     const { data, content } = matter(fileContent)
     
     return {
       slug: lesson,
+      content,
       study,
       lesson,
-      content,
       ...data,
     } as StudyContent
   } catch (error) {
-    console.error(`Error reading study lesson ${study}/${lesson}:`, error)
+    console.error(`Error reading lesson ${lesson} in study ${study}:`, error)
     return null
   }
 }
+
+
 
 /**
  * Compile MDX content to HTML

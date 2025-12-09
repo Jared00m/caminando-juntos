@@ -3,6 +3,7 @@ import { MDXRenderer } from '@/components/mdx/MDXRenderer'
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import { ArticleStructuredData, BreadcrumbStructuredData } from '@/components/StructuredData'
+import { cookies } from 'next/headers'
 
 interface ArticlePageProps {
   params: Promise<{
@@ -12,7 +13,9 @@ interface ArticlePageProps {
 
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
   const { slug } = await params
-  const article = await getArticle(slug)
+  const cookieStore = await cookies()
+  const locale = cookieStore.get('NEXT_LOCALE')?.value || 'es'
+  const article = await getArticle(slug, locale)
 
   if (!article) {
     return {
@@ -21,19 +24,19 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
   }
 
   return {
-    title: `${article.title} | Dios Habla`,
-    description: article.description || `Lee ${article.title} en Dios Habla - artículos que inspiran fe.`,
+    title: `${article.title} | Caminando Juntos`,
+    description: article.description || `Lee ${article.title} en Caminando Juntos - artículos que inspiran fe.`,
     keywords: article.tags || ['artículo cristiano', 'fe', 'evangelio'],
-    authors: article.author ? [{ name: article.author }] : [{ name: 'Dios Habla' }],
+    authors: article.author ? [{ name: article.author }] : [{ name: 'Caminando Juntos' }],
     openGraph: {
       type: 'article',
-      locale: 'es_ES',
-      url: `https://dioshabla.org/articulos/${slug}`,
+      locale: locale === 'pt' ? 'pt_BR' : 'es_ES',
+      url: `https://cjuntos.org/articulos/${slug}`,
       title: article.title,
       description: article.description || '',
-      siteName: 'Dios Habla',
+      siteName: 'Caminando Juntos',
       publishedTime: article.date,
-      authors: article.author ? [article.author] : ['Dios Habla'],
+      authors: article.author ? [article.author] : ['Caminando Juntos'],
       tags: article.tags,
       images: article.cover ? [{
         url: article.cover,
@@ -49,14 +52,16 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
       images: article.cover ? [article.cover] : [],
     },
     alternates: {
-      canonical: `https://dioshabla.org/articulos/${slug}`,
+      canonical: `https://cjuntos.org/articulos/${slug}`,
     },
   }
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { slug } = await params
-  const article = await getArticle(slug)
+  const cookieStore = await cookies()
+  const locale = cookieStore.get('NEXT_LOCALE')?.value || 'es'
+  const article = await getArticle(slug, locale)
 
   if (!article) {
     notFound()
@@ -68,15 +73,15 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         title={article.title}
         description={article.description || ''}
         datePublished={article.date}
-        author={article.author || 'Dios Habla'}
+        author={article.author || 'Caminando Juntos'}
         image={article.cover}
-        url={`https://dioshabla.org/articulos/${slug}`}
+        url={`https://cjuntos.org/articulos/${slug}`}
       />
       <BreadcrumbStructuredData
         items={[
-          { name: 'Inicio', url: 'https://dioshabla.org' },
-          { name: 'Artículos', url: 'https://dioshabla.org/articulos' },
-          { name: article.title, url: `https://dioshabla.org/articulos/${slug}` },
+          { name: 'Inicio', url: 'https://cjuntos.org' },
+          { name: 'Artículos', url: 'https://cjuntos.org/articulos' },
+          { name: article.title, url: `https://cjuntos.org/articulos/${slug}` },
         ]}
       />
       <article className="max-w-4xl mx-auto">

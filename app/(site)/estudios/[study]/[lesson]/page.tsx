@@ -5,6 +5,7 @@ import { LessonNavigation } from '@/components/study/LessonNavigation'
 import { MDXRenderer } from '@/lib/mdx-renderer'
 import { Metadata } from 'next'
 import { ArticleStructuredData, BreadcrumbStructuredData } from '@/components/StructuredData'
+import { cookies } from 'next/headers'
 
 interface LessonPageProps {
   params: Promise<{
@@ -15,9 +16,12 @@ interface LessonPageProps {
 
 export async function generateMetadata({ params }: LessonPageProps): Promise<Metadata> {
   const { study, lesson } = await params
+  const cookieStore = await cookies()
+  const locale = cookieStore.get('NEXT_LOCALE')?.value || 'es'
+  
   const [lessonData, studyMetadata] = await Promise.all([
-    getStudyLesson(study, lesson),
-    getStudyMetadata(study)
+    getStudyLesson(study, lesson, locale),
+    getStudyMetadata(study, locale)
   ])
 
   if (!lessonData) {
@@ -31,16 +35,16 @@ export async function generateMetadata({ params }: LessonPageProps): Promise<Met
   ).join(' ')
 
   return {
-    title: `${lessonData.title} - ${studyTitle} | Dios Habla`,
+    title: `${lessonData.title} - ${studyTitle} | Caminando Juntos`,
     description: lessonData.description || `Estudia ${lessonData.title} en el curso de ${studyTitle}`,
     keywords: lessonData.tags || ['estudio bíblico', 'lección', studyTitle],
     openGraph: {
       type: 'article',
-      locale: 'es_ES',
-      url: `https://dioshabla.org/estudios/${study}/${lesson}`,
+      locale: locale === 'pt' ? 'pt_BR' : 'es_ES',
+      url: `https://cjuntos.org/estudios/${study}/${lesson}`,
       title: lessonData.title,
       description: lessonData.description || '',
-      siteName: 'Dios Habla',
+      siteName: 'Caminando Juntos',
       images: studyMetadata?.thumbnail ? [{
         url: studyMetadata.thumbnail,
         width: 1200,
@@ -55,16 +59,18 @@ export async function generateMetadata({ params }: LessonPageProps): Promise<Met
       images: studyMetadata?.thumbnail ? [studyMetadata.thumbnail] : [],
     },
     alternates: {
-      canonical: `https://dioshabla.org/estudios/${study}/${lesson}`,
+      canonical: `https://cjuntos.org/estudios/${study}/${lesson}`,
     },
   }
 }
 
 export default async function LessonPage({ params }: LessonPageProps) {
   const { study, lesson } = await params
+  const cookieStore = await cookies()
+  const locale = cookieStore.get('NEXT_LOCALE')?.value || 'es'
   
-  const lessonData = await getStudyLesson(study, lesson)
-  const allLessons = await getStudyLessons(study)
+  const lessonData = await getStudyLesson(study, lesson, locale)
+  const allLessons = await getStudyLessons(study, locale)
 
   if (!lessonData || !allLessons) {
     notFound()
@@ -86,15 +92,15 @@ export default async function LessonPage({ params }: LessonPageProps) {
         title={lessonData.title}
         description={lessonData.description || ''}
         datePublished={lessonData.date}
-        author="Dios Habla"
-        url={`https://dioshabla.org/estudios/${study}/${lesson}`}
+        author="Caminando Juntos"
+        url={`https://cjuntos.org/estudios/${study}/${lesson}`}
       />
       <BreadcrumbStructuredData
         items={[
-          { name: 'Inicio', url: 'https://dioshabla.org' },
-          { name: 'Estudios', url: 'https://dioshabla.org/estudios' },
-          { name: studyTitle, url: `https://dioshabla.org/estudios/${study}` },
-          { name: lessonData.title, url: `https://dioshabla.org/estudios/${study}/${lesson}` },
+          { name: 'Inicio', url: 'https://cjuntos.org' },
+          { name: 'Estudios', url: 'https://cjuntos.org/estudios' },
+          { name: studyTitle, url: `https://cjuntos.org/estudios/${study}` },
+          { name: lessonData.title, url: `https://cjuntos.org/estudios/${study}/${lesson}` },
         ]}
       />
       <div className="container mx-auto px-4 py-12">

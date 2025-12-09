@@ -27,18 +27,18 @@ export function ArticleStructuredData({
     author: {
       '@type': 'Organization',
       name: author,
-      url: 'https://dioshabla.org',
+      url: 'https://cjuntos.org',
     },
     publisher: {
       '@type': 'Organization',
-      name: 'Dios Habla',
-      url: 'https://dioshabla.org',
+      name: 'Caminando Juntos',
+      url: 'https://cjuntos.org',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://dioshabla.org/logo.png',
+        url: 'https://cjuntos.org/logo.png',
       },
     },
-    image: image || 'https://dioshabla.org/logo.png',
+    image: image || 'https://cjuntos.org/logo.png',
     mainEntityOfPage: {
       '@type': 'WebPage',
       '@id': url,
@@ -105,7 +105,7 @@ export function CourseStructuredData({
     provider: {
       '@type': 'Organization',
       name: provider,
-      url: 'https://dioshabla.org',
+      url: 'https://cjuntos.org',
     },
     url: url,
     ...(numberOfLessons && { numberOfLessons }),

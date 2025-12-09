@@ -1,15 +1,20 @@
 import { getArticles } from '@/lib/content-git'
 import Link from 'next/link'
+import { cookies } from 'next/headers'
+import { getDictionary, Locale } from '@/lib/i18n'
 
 export default async function ArticlesPage() {
-  const articles = await getArticles()
+  const cookieStore = await cookies()
+  const locale = (cookieStore.get('NEXT_LOCALE')?.value || 'es') as Locale
+  const dict = getDictionary(locale)
+  const articles = await getArticles(locale)
 
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="max-w-4xl mx-auto mb-12">
-        <h1 className="text-5xl font-bold mb-6 text-deep-indigo">Artículos</h1>
+        <h1 className="text-5xl font-bold mb-6 text-deep-indigo">{dict.articles.title}</h1>
         <p className="text-xl text-muted-foreground leading-relaxed">
-          Explora artículos que iluminan tu camino y profundizan tu comprensión de la Biblia.
+          {dict.articles.subtitle}
         </p>
       </div>
 
@@ -20,9 +25,9 @@ export default async function ArticlesPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.832 18.477 19.246 18 17.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
           </div>
-          <h3 className="text-xl font-semibold text-deep-indigo mb-2">Próximamente</h3>
+          <h3 className="text-xl font-semibold text-deep-indigo mb-2">{dict.articles.comingSoon.title}</h3>
           <p className="text-muted-foreground">
-            Estamos preparando contenido inspirador para ti.
+            {dict.articles.comingSoon.message}
           </p>
         </div>
       ) : (
@@ -50,7 +55,7 @@ export default async function ArticlesPage() {
                   <p className="text-muted-foreground mb-4 leading-relaxed">{article.description}</p>
                 )}
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <span>{new Date(article.date).toLocaleDateString('es-ES')}</span>
+                  <span>{new Date(article.date).toLocaleDateString(locale === 'pt' ? 'pt-BR' : 'es-ES')}</span>
                   {article.tags && article.tags.length > 0 && (
                     <div className="flex gap-2">
                       {article.tags.slice(0, 2).map((tag) => (

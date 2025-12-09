@@ -1,8 +1,11 @@
 import { getVideos } from '@/lib/content-git'
 import Link from 'next/link'
+import { cookies } from 'next/headers'
 
 export default async function VideosPage() {
-  const videos = await getVideos()
+  const cookieStore = await cookies()
+  const locale = cookieStore.get('NEXT_LOCALE')?.value || 'es'
+  const videos = await getVideos(locale)
 
   return (
     <div className="container mx-auto px-4 py-12">

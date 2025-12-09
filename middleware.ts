@@ -85,6 +85,21 @@ export async function middleware(request: NextRequest) {
     })
   }
 
+  // Set locale based on country
+  const country = existingCountry || headerCountry || getDefaultCountryCode()
+  const locale = country === 'BR' ? 'pt' : 'es'
+  
+  // Only set if different or missing
+  const currentLocale = request.cookies.get('NEXT_LOCALE')?.value
+  if (currentLocale !== locale) {
+    response.cookies.set('NEXT_LOCALE', locale, {
+      maxAge: 60 * 60 * 24 * 365, // 1 year
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+    })
+  }
+
   return response
 }
 

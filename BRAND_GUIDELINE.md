@@ -1,4 +1,4 @@
-# DIOS HABLA – Brand & Style Guidelines
+# CAMINANDO JUNTOS – Brand & Style Guidelines
 
 ## 1. Brand Essence
 
@@ -125,7 +125,7 @@ All images must communicate **light, hope, and accessibility**. Visual tone is m
 
 ## 7. Logo System
 
-**Primary Mark:** Dios Habla wordmark in Montserrat Bold, with accent color in Sunrise Gold
+**Primary Mark:** Caminando Juntos wordmark in Montserrat Bold, with accent color in Sunrise Gold
 
 **Symbol:** Open Bible emitting sound waves and light rays (representing hearing and revelation)
 

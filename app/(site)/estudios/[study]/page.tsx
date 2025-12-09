@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import { CourseStructuredData, BreadcrumbStructuredData } from '@/components/StructuredData'
+import { cookies } from 'next/headers'
 
 interface StudyPageProps {
   params: Promise<{
@@ -12,7 +13,9 @@ interface StudyPageProps {
 
 export async function generateMetadata({ params }: StudyPageProps): Promise<Metadata> {
   const { study } = await params
-  const metadata = await getStudyMetadata(study)
+  const cookieStore = await cookies()
+  const locale = cookieStore.get('NEXT_LOCALE')?.value || 'es'
+  const metadata = await getStudyMetadata(study, locale)
 
   if (!metadata) {
     return {
@@ -21,16 +24,16 @@ export async function generateMetadata({ params }: StudyPageProps): Promise<Meta
   }
 
   return {
-    title: `${metadata.title} | Dios Habla`,
+    title: `${metadata.title} | Caminando Juntos`,
     description: metadata.description,
     keywords: metadata.tags || ['estudio bíblico', metadata.title, 'curso bíblico'],
     openGraph: {
       type: 'website',
-      locale: 'es_ES',
-      url: `https://dioshabla.org/estudios/${study}`,
+      locale: locale === 'pt' ? 'pt_BR' : 'es_ES',
+      url: `https://cjuntos.org/estudios/${study}`,
       title: metadata.title,
       description: metadata.description,
-      siteName: 'Dios Habla',
+      siteName: 'Caminando Juntos',
       images: metadata.thumbnail ? [{
         url: metadata.thumbnail,
         width: 1200,
@@ -45,16 +48,19 @@ export async function generateMetadata({ params }: StudyPageProps): Promise<Meta
       images: metadata.thumbnail ? [metadata.thumbnail] : [],
     },
     alternates: {
-      canonical: `https://dioshabla.org/estudios/${study}`,
+      canonical: `https://cjuntos.org/estudios/${study}`,
     },
   }
 }
 
 export default async function StudyPage({ params }: StudyPageProps) {
   const { study } = await params
+  const cookieStore = await cookies()
+  const locale = cookieStore.get('NEXT_LOCALE')?.value || 'es'
+  
   const [lessons, metadata] = await Promise.all([
-    getStudyLessons(study),
-    getStudyMetadata(study)
+    getStudyLessons(study, locale),
+    getStudyMetadata(study, locale)
   ])
 
   if (!lessons || lessons.length === 0) {
@@ -75,16 +81,16 @@ export default async function StudyPage({ params }: StudyPageProps) {
           <CourseStructuredData
             name={studyTitle}
             description={studyDescription}
-            provider="Dios Habla"
-            url={`https://dioshabla.org/estudios/${study}`}
+            provider="Caminando Juntos"
+            url={`https://cjuntos.org/estudios/${study}`}
             numberOfLessons={metadata.lessons || lessons.length}
             estimatedTime={metadata.estimatedTime}
           />
           <BreadcrumbStructuredData
             items={[
-              { name: 'Inicio', url: 'https://dioshabla.org' },
-              { name: 'Estudios', url: 'https://dioshabla.org/estudios' },
-              { name: studyTitle, url: `https://dioshabla.org/estudios/${study}` },
+              { name: 'Inicio', url: 'https://cjuntos.org' },
+              { name: 'Estudios', url: 'https://cjuntos.org/estudios' },
+              { name: studyTitle, url: `https://cjuntos.org/estudios/${study}` },
             ]}
           />
         </>

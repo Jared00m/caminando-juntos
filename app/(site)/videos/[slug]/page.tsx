@@ -2,6 +2,7 @@ import { getVideo } from '@/lib/content-git'
 import { MDXRenderer } from '@/components/mdx/MDXRenderer'
 import { YouTube } from '@/components/mdx/YouTube'
 import { notFound } from 'next/navigation'
+import { cookies } from 'next/headers'
 
 interface VideoPageProps {
   params: Promise<{
@@ -11,7 +12,9 @@ interface VideoPageProps {
 
 export default async function VideoPage({ params }: VideoPageProps) {
   const { slug } = await params
-  const video = await getVideo(slug)
+  const cookieStore = await cookies()
+  const locale = cookieStore.get('NEXT_LOCALE')?.value || 'es'
+  const video = await getVideo(slug, locale)
 
   if (!video) {
     notFound()
@@ -30,7 +33,7 @@ export default async function VideoPage({ params }: VideoPageProps) {
           
           <div className="flex items-center justify-between border-b pb-6">
             <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-              <span>{new Date(video.date).toLocaleDateString('es-ES', {
+              <span>{new Date(video.date).toLocaleDateString(locale === 'pt' ? 'pt-BR' : 'es-ES', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
@@ -75,16 +78,16 @@ export default async function VideoPage({ params }: VideoPageProps) {
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              Volver a videos
+              {locale === 'pt' ? 'Voltar para vídeos' : 'Volver a videos'}
             </a>
             
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-muted-foreground">¿Te gustó este video?</span>
+              <span className="text-sm text-muted-foreground">{locale === 'pt' ? 'Gostou deste vídeo?' : '¿Te gustó este video?'}</span>
               <a
                 href="/estudios"
                 className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
               >
-                Continúa con estudios
+                {locale === 'pt' ? 'Continue com estudos' : 'Continúa con estudios'}
               </a>
             </div>
           </div>

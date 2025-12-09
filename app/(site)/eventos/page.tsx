@@ -2,18 +2,21 @@ import { LocalEvents } from '@/components/LocalEvents'
 import { Only } from '@/components/Only'
 import { isEnabled } from '@/lib/featureFlags'
 import { cookies } from 'next/headers'
+import { getDictionary, Locale } from '@/lib/i18n'
 
 export default async function EventsPage() {
   const cookieStore = await cookies()
   const countryCode = cookieStore.get('cc')?.value || 'ES'
+  const locale = (cookieStore.get('NEXT_LOCALE')?.value || 'es') as Locale
   const eventsEnabled = await isEnabled('events', countryCode)
+  const dict = getDictionary(locale)
 
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="max-w-4xl mx-auto mb-12">
-        <h1 className="text-5xl font-bold mb-6 text-deep-indigo">Eventos Locales</h1>
+        <h1 className="text-5xl font-bold mb-6 text-deep-indigo">{dict.events.title}</h1>
         <p className="text-xl text-muted-foreground leading-relaxed">
-          Encuentra eventos y actividades en tu región para conectar con una comunidad de fe.
+          {dict.events.subtitle}
         </p>
       </div>
       
@@ -30,11 +33,10 @@ export default async function EventsPage() {
               </div>
               <div className="ml-6">
                 <h3 className="text-lg font-semibold text-deep-indigo mb-2">
-                  Eventos personalizados por región
+                  {dict.events.personalized.title}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Los eventos que ves aquí están filtrados según tu ubicación. 
-                  Si no ves eventos en tu área, prueba cambiando tu país en el selector de región.
+                  {dict.events.personalized.description}
                 </p>
               </div>
             </div>
@@ -51,16 +53,16 @@ export default async function EventsPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
-          <h3 className="text-xl font-semibold text-deep-indigo mb-2">Los eventos no están disponibles</h3>
+          <h3 className="text-xl font-semibold text-deep-indigo mb-2">{dict.events.unavailable.title}</h3>
           <p className="text-muted-foreground mb-6">
-            Esta función está temporalmente deshabilitada. Vuelve pronto para ver eventos en tu región.
+            {dict.events.unavailable.description}
           </p>
           <div className="mt-8">
             <a
               href="/encuentra-ayuda"
               className="inline-flex items-center px-8 py-4 border-2 border-transparent shadow-lg text-base font-semibold rounded-lg text-white bg-celestial-blue hover:bg-celestial-blue/90 hover:scale-105 transition-all"
             >
-              Encuentra ayuda local
+              {dict.events.unavailable.cta}
             </a>
           </div>
         </div>

@@ -3,4 +3,4 @@ User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://dioshabla.org/sitemap.xml
+Sitemap: https://cjuntos.org/sitemap.xml

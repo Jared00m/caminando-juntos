@@ -32,6 +32,11 @@ export function CountrySwitcher() {
   const handleCountryChange = (countryCode: string) => {
     setCurrentCountry(countryCode)
     Cookies.set('cc', countryCode, { expires: 30 }) // 30 days
+    
+    // Set locale based on country
+    const locale = countryCode === 'BR' ? 'pt' : 'es'
+    Cookies.set('NEXT_LOCALE', locale, { expires: 30 })
+
     setIsOpen(false)
     // Reload page to update content based on new country
     window.location.reload()

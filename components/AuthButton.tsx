@@ -3,10 +3,24 @@
 import { useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
 
-export function AuthButton() {
+interface AuthButtonProps {
+  dictionary?: {
+    signIn: string
+    signUp: string
+    signOut: string
+  }
+}
+
+export function AuthButton({ dictionary }: AuthButtonProps) {
   const { user, isAuthenticated, isLoading, signOut } = useAuth()
   const [showModal, setShowModal] = useState(false)
   const [isSignUp, setIsSignUp] = useState(false)
+
+  const t = dictionary || {
+    signIn: 'Iniciar sesión',
+    signUp: 'Registrarse',
+    signOut: 'Cerrar sesión',
+  }
 
   if (isLoading) {
     return <div className="h-9 w-20 bg-gray-200 animate-pulse rounded-lg" />
@@ -22,7 +36,7 @@ export function AuthButton() {
           onClick={() => signOut()}
           className="px-4 py-2 text-sm font-medium text-celestial-blue hover:text-celestial-blue/80 transition-colors"
         >
-          Cerrar sesión
+          {t.signOut}
         </button>
       </div>
     )
@@ -37,7 +51,7 @@ export function AuthButton() {
         }}
         className="px-4 py-2 text-sm font-medium text-celestial-blue hover:text-celestial-blue/80 transition-colors"
       >
-        Iniciar sesión
+        {t.signIn}
       </button>
 
       {showModal && (

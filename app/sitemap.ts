@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next'
 import { getArticles, getStudiesWithMetadata, getStudyLessons } from '@/lib/content-git'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://dioshabla.org'
+  const baseUrl = 'https://cjuntos.org'
   
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
