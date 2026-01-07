@@ -1,6 +1,6 @@
 import { getVideo } from '@/lib/content-git'
-import { MDXRenderer } from '@/components/mdx/MDXRenderer'
-import { YouTube } from '@/components/mdx/YouTube'
+import { MDXRenderer } from '@/lib/mdx-renderer'
+import { YouTube } from '@/components/YouTube'
 import { notFound } from 'next/navigation'
 import { cookies } from 'next/headers'
 
@@ -65,7 +65,7 @@ export default async function VideoPage({ params }: VideoPageProps) {
 
         {/* Content */}
         <div className="prose prose-lg max-w-none">
-          <MDXRenderer content={video.content} frontmatter={video} />
+          <MDXRenderer content={video.content} />
         </div>
 
         {/* Footer */}

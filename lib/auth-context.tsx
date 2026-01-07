@@ -48,7 +48,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     try {
       console.log('Fetching user role for user ID:', currentUser.id)
-      const { data, error } = await supabase.rpc('get_user_role', { user_id: currentUser.id })
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('role')
+        .eq('id', currentUser.id)
+        .maybeSingle()
+
       console.log('User role data:', data, 'Error:', error)
 
       if (error) {
@@ -56,6 +61,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsAdmin(false)
         return
       }
+
+      console.log(data?.role === 'admin');
 
       setIsAdmin(data?.role === 'admin')
     } catch (err) {
@@ -76,7 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!isMounted) return
 
         setUser(session?.user ?? null)
-        // await checkAdmin(session?.user ?? null)
+        await checkAdmin(session?.user ?? null)
       } catch (err) {
         console.error('Error initializing session:', err)
       } finally {
@@ -90,11 +97,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!isMounted) return
 
       setUser(session?.user ?? null)
-      await checkAdmin(session?.user ?? null)
+      
+      // Defer the admin check to avoid deadlock in the auth callback
+      Promise.resolve().then(() => {
+        checkAdmin(session?.user ?? null)
+      })
     })
 
     return () => {

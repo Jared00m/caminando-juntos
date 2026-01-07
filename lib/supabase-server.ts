@@ -1,5 +1,5 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
-import { Region, City, Event, Contact, StudyProgress, FeatureFlag } from './types'
+import { Region, City, Event, Contact, Church, StudyProgress, FeatureFlag } from './types'
 
 const supabaseUrl = process.env.SUPABASE_URL
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -196,6 +196,91 @@ export async function getContactsByCity(cityId: number): Promise<Contact[]> {
     return data || []
   } catch (error) {
     console.error('Error fetching city contacts:', error)
+    return []
+  }
+}
+
+// Church functions
+export async function getChurchesByCountry(countryCode: string): Promise<Church[]> {
+  if (!supabase) {
+    console.warn('Supabase not configured, returning empty churches')
+    return []
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('churches')
+      .select(
+        [
+          'id',
+          'country_code',
+          'city_id',
+          'name',
+          'contact_phone',
+          'contact_phone_type',
+          'contact_email',
+          'website_url',
+          'address',
+          'published',
+          'created_at',
+          'updated_at',
+          'city:cities(id,city_name)',
+        ].join(',')
+      )
+      .eq('country_code', countryCode)
+      .eq('published', true)
+      .order('name')
+
+    if (error) {
+      console.error('Error fetching churches:', error)
+      return []
+    }
+
+    return (data || []) as unknown as Church[]
+  } catch (error) {
+    console.error('Error fetching churches:', error)
+    return []
+  }
+}
+
+export async function getChurchesByCity(cityId: number): Promise<Church[]> {
+  if (!supabase) {
+    console.warn('Supabase not configured, returning empty churches')
+    return []
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('churches')
+      .select(
+        [
+          'id',
+          'country_code',
+          'city_id',
+          'name',
+          'contact_phone',
+          'contact_phone_type',
+          'contact_email',
+          'website_url',
+          'address',
+          'published',
+          'created_at',
+          'updated_at',
+          'city:cities(id,city_name)',
+        ].join(',')
+      )
+      .eq('city_id', cityId)
+      .eq('published', true)
+      .order('name')
+
+    if (error) {
+      console.error('Error fetching city churches:', error)
+      return []
+    }
+
+    return (data || []) as unknown as Church[]
+  } catch (error) {
+    console.error('Error fetching city churches:', error)
     return []
   }
 }

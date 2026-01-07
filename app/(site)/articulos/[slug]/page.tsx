@@ -1,5 +1,5 @@
 import { getArticle } from '@/lib/content-git'
-import { MDXRenderer } from '@/components/mdx/MDXRenderer'
+import { MDXRenderer } from '@/lib/mdx-renderer';
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import { ArticleStructuredData, BreadcrumbStructuredData } from '@/components/StructuredData'
@@ -130,7 +130,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
         {/* Content */}
         <div className="prose prose-lg max-w-none">
-          <MDXRenderer content={article.content} frontmatter={article} />
+          <MDXRenderer content={article.content} />
         </div>
 
         {/* Footer */}

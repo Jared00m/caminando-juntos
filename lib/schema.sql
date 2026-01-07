@@ -9,6 +9,37 @@ create table if not exists regions(
   country_name text not null
 );
 
+-- Ensure unique constraint exists for ON CONFLICT (in case table existed previously without PK)
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint c
+    join pg_class t on t.oid = c.conrelid
+    join pg_namespace n on n.oid = t.relnamespace
+    where n.nspname = 'public'
+      and t.relname = 'regions'
+      and c.contype in ('p','u')
+      and pg_get_constraintdef(c.oid) like '%(country_code)%'
+  ) then
+    -- If duplicates exist from a previous non-constrained table, keep one row per country_code
+    if exists (
+      select 1 from regions group by country_code having count(*) > 1
+    ) then
+      delete from regions r
+      using (
+        select ctid,
+               row_number() over (partition by country_code order by country_name asc) as rn
+        from regions
+      ) d
+      where r.ctid = d.ctid
+        and d.rn > 1;
+    end if;
+
+    alter table regions add constraint regions_country_code_key unique (country_code);
+  end if;
+end $$;
+
 -- Cities table
 create table if not exists cities(
   id bigserial primary key,
@@ -45,6 +76,38 @@ create table if not exists contacts(
   published boolean default true,
   created_at timestamptz default now()
 );
+
+-- Churches table for local churches
+create table if not exists churches(
+  id bigserial primary key,
+  country_code text references regions(country_code) on delete cascade,
+  city_id bigint references cities(id) on delete set null,
+  name text not null,
+  contact_phone text,
+  contact_phone_type text check (contact_phone_type in ('whatsapp','phone')),
+  contact_email text,
+  website_url text,
+  address text,
+  published boolean default true,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+-- Add/rename church address column if needed (migration)
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_name = 'churches' and column_name = 'directions'
+  ) then
+    alter table churches rename column directions to address;
+  elsif not exists (
+    select 1 from information_schema.columns
+    where table_name = 'churches' and column_name = 'address'
+  ) then
+    alter table churches add column address text;
+  end if;
+end $$;
 
 -- Study progress tracking (supports both anonymous and authenticated users)
 create table if not exists study_progress(
@@ -146,6 +209,43 @@ create table if not exists feature_flags(
   updated_at timestamptz default now()
 );
 
+-- Ensure unique constraint exists for ON CONFLICT (in case table existed previously without PK)
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint c
+    join pg_class t on t.oid = c.conrelid
+    join pg_namespace n on n.oid = t.relnamespace
+    where n.nspname = 'public'
+      and t.relname = 'feature_flags'
+      and c.contype in ('p','u')
+      and pg_get_constraintdef(c.oid) like '%(key)%'
+  ) then
+    -- If duplicates exist from a previous non-constrained table, keep one row per key.
+    -- Preference order: enabled=true, latest updated_at/created_at.
+    if exists (
+      select 1 from feature_flags group by key having count(*) > 1
+    ) then
+      delete from feature_flags f
+      using (
+        select ctid,
+               row_number() over (
+                 partition by key
+                 order by enabled desc,
+                          updated_at desc nulls last,
+                          created_at desc nulls last
+               ) as rn
+        from feature_flags
+      ) d
+      where f.ctid = d.ctid
+        and d.rn > 1;
+    end if;
+
+    alter table feature_flags add constraint feature_flags_key_key unique (key);
+  end if;
+end $$;
+
 -- Insert default feature flags
 insert into feature_flags (key, enabled, notes) values
   ('reminders', false, 'Study reminders feature'),
@@ -185,6 +285,8 @@ create index if not exists idx_events_city_published on events(city_id, publishe
 create index if not exists idx_events_starts_at on events(starts_at);
 create index if not exists idx_contacts_country_published on contacts(country_code, published);
 create index if not exists idx_contacts_city_published on contacts(city_id, published);
+create index if not exists idx_churches_country_published on churches(country_code, published);
+create index if not exists idx_churches_city_published on churches(city_id, published);
 create index if not exists idx_study_progress_user_id on study_progress(user_id);
 create index if not exists idx_study_progress_anon_id on study_progress(anon_id);
 create index if not exists idx_study_progress_study_lesson on study_progress(study_id, lesson_id);
@@ -198,6 +300,7 @@ alter table regions enable row level security;
 alter table cities enable row level security;
 alter table events enable row level security;
 alter table contacts enable row level security;
+alter table churches enable row level security;
 alter table study_progress enable row level security;
 alter table study_notes enable row level security;
 alter table study_questions enable row level security;
@@ -216,6 +319,9 @@ create policy "Public events access" on events for select using (published = tru
 
 drop policy if exists "Public contacts access" on contacts;
 create policy "Public contacts access" on contacts for select using (published = true);
+
+drop policy if exists "Public churches access" on churches;
+create policy "Public churches access" on churches for select using (published = true);
 
 drop policy if exists "Public feature flags access" on feature_flags;
 create policy "Public feature flags access" on feature_flags for select using (true);
@@ -304,6 +410,10 @@ create trigger update_study_questions_updated_at before update on study_question
 
 drop trigger if exists update_user_profiles_updated_at on user_profiles;
 create trigger update_user_profiles_updated_at before update on user_profiles
+  for each row execute procedure update_updated_at_column();
+
+drop trigger if exists update_churches_updated_at on churches;
+create trigger update_churches_updated_at before update on churches
   for each row execute procedure update_updated_at_column();
 
 -- Function to handle new user creation

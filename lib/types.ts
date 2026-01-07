@@ -37,6 +37,25 @@ export interface Contact {
   created_at: string
 }
 
+export interface Church {
+  id: number
+  country_code?: string
+  city_id?: number
+  name: string
+  contact_phone?: string
+  contact_phone_type?: 'whatsapp' | 'phone'
+  contact_email?: string
+  website_url?: string
+  address?: string
+  published: boolean
+  created_at: string
+  updated_at: string
+  city?: {
+    id: number
+    city_name: string
+  } | null
+}
+
 export interface StudyProgress {
   id: number
   anon_id: string

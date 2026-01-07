@@ -152,10 +152,8 @@ export default async function LessonPage({ params }: LessonPageProps) {
           </div>
 
           {/* Lesson Content */}
-          <article className="prose prose-lg max-w-none mb-12">
-            <div className="bg-white rounded-3xl p-10 shadow-xl border border-border">
-              <MDXRenderer content={lessonData.content} />
-            </div>
+          <article className="mb-12">
+            <MDXRenderer content={lessonData.content} />
           </article>
 
           {/* Navigation */}

@@ -9,6 +9,8 @@ import { Suspense } from 'react'
 import { cookies } from 'next/headers'
 import { getDictionary, Locale } from '@/lib/i18n'
 import { CountrySwitcher } from '@/components/CountrySwitcher'
+import { MobileNav } from '@/components/MobileNav'
+import { NavDropdown } from '@/components/NavDropdown'
 
 export async function generateMetadata(): Promise<Metadata> {
   const cookieStore = await cookies()
@@ -75,58 +77,80 @@ export default async function RootLayout({
       <head>
         <Analytics />
       </head>
-      <body className="min-h-screen bg-background font-sans antialiased">
+      <body className="min-h-screen font-sans antialiased">
         <AuthProvider>
           <Suspense fallback={null}>
             <AuthErrorHandler />
           </Suspense>
           <div className="relative flex min-h-screen flex-col">
-          <header className="sticky top-0 z-40 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 shadow-sm">
-            <div className="container flex h-16 items-center">
-              <div className="mr-4 hidden md:flex">
-                <a className="mr-8 flex items-center space-x-3 group" href="/">
+          <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white shadow-sm">
+            <div className="container mx-auto px-4">
+              <div className="flex h-16 items-center justify-between">
+                {/* Logo */}
+                <a className="flex items-center gap-2 group" href="/">
                   <img 
                     src="/logo.png" 
                     alt="Caminando Juntos" 
-                    className="h-10 w-auto group-hover:scale-105 transition-transform"
+                    className="h-9 w-auto transition-transform group-hover:scale-105"
                   />
-                  <span className="hidden font-bold text-xl sm:inline-block bg-gradient-to-r from-celestial-blue to-deep-indigo bg-clip-text text-transparent">
+                  <span className="hidden md:block text-lg font-bold text-gray-800">
                     Caminando Juntos
                   </span>
                 </a>
-                <nav className="flex items-center space-x-6 text-sm font-medium">
-                  <a href="/" className="transition-colors hover:text-celestial-blue text-foreground/70">
-                    {dict.common.home}
-                  </a>
-                  <a href="/articulos" className="transition-colors hover:text-celestial-blue text-foreground/70">
-                    {dict.common.articles}
-                  </a>
-                  <a href="/videos" className="transition-colors hover:text-celestial-blue text-foreground/70">
-                    {dict.common.videos}
-                  </a>
-                  <a href="/estudios" className="transition-colors hover:text-celestial-blue text-foreground/70">
-                    {dict.common.studies}
-                  </a>
-                  <a href="/eventos" className="transition-colors hover:text-celestial-blue text-foreground/70">
-                    {dict.common.events}
-                  </a>
-                  <a href="/encuentra-ayuda" className="transition-colors hover:text-celestial-blue text-foreground/70">
-                    {dict.common.findHelp}
-                  </a>
+
+                {/* Desktop Navigation */}
+                <nav className="hidden lg:flex items-center gap-6">
+                  <NavDropdown
+                    label={dict.common.nav.startHere}
+                    items={[
+                      { label: dict.common.nav.whatIsGospel, href: '/comienza-aqui/que-es-el-evangelio' },
+                      { label: dict.common.nav.whoIsJesus, href: '/comienza-aqui/quien-es-jesus' },
+                      { label: dict.common.nav.testimonies, href: '/comienza-aqui/testimonios' },
+                      { label: dict.common.nav.firstSteps, href: '/comienza-aqui/primeros-pasos' },
+                    ]}
+                  />
+                  <NavDropdown
+                    label={dict.common.nav.goDeeper}
+                    items={[
+                      { label: dict.common.nav.bibleStudies, href: '/estudios' },
+                      { label: dict.common.nav.apologetics, href: '/profundiza/apologetica' },
+                      { label: dict.common.nav.sharingFaith, href: '/profundiza/comparte-tu-fe' },
+                    ]}
+                  />
+                  <NavDropdown
+                    label={dict.common.nav.findCommunity}
+                    items={[
+                      { label: dict.common.nav.findMentor, href: '/comunidad/encuentra-mentor' },
+                      { label: dict.common.nav.findChurch, href: '/comunidad/encuentra-iglesia' },
+                      { label: dict.common.nav.chat, href: '/comunidad/chat' },
+                    ]}
+                  />
+                  <NavDropdown
+                    label={dict.common.nav.aboutUs}
+                    items={[
+                      { label: dict.common.nav.beliefs, href: '/acerca-de/creencias' },
+                      { label: dict.common.nav.whoWeAre, href: '/acerca-de/quienes-somos' },
+                      { label: dict.common.nav.contact, href: '/acerca-de/contacto' },
+                    ]}
+                  />
                 </nav>
-              </div>
-              <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-                <CountrySwitcher />
-                <AuthButton dictionary={dict.common.auth} />
-                <div className="w-full flex-1 md:w-auto md:flex-none">
-                  {/* Country switcher will go here */}
+
+                {/* Right side */}
+                <div className="flex items-center gap-3">
+                  <div className="hidden lg:block">
+                    <CountrySwitcher />
+                  </div>
+                  <div className="hidden lg:block">
+                    <AuthButton dictionary={dict.common.auth} />
+                  </div>
+                  <MobileNav dictionary={dict.common} />
                 </div>
               </div>
             </div>
           </header>
           <main className="flex-1">{children}</main>
           <footer className="border-t bg-gradient-to-br from-deep-indigo to-celestial-blue text-white py-8 md:py-12">
-            <div className="container">
+            <div className="container mx-auto">
               <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="flex flex-col items-center md:items-start gap-3">
                   <div className="flex items-center space-x-3">

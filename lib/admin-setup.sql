@@ -10,6 +10,7 @@ drop policy if exists "Admins can manage cities" on cities;
 drop policy if exists "Admins can manage regions" on regions;
 drop policy if exists "Admins can manage events" on events;
 drop policy if exists "Admins can manage contacts" on contacts;
+drop policy if exists "Admins can manage churches" on churches;
 drop policy if exists "Admins can manage feature flags" on feature_flags;
 
 -- 3. Create a secure function to check admin status without recursion
@@ -41,6 +42,10 @@ create policy "Admins can manage events" on events
 
 -- Contacts
 create policy "Admins can manage contacts" on contacts
+  for all using ( is_admin() );
+
+-- Churches
+create policy "Admins can manage churches" on churches
   for all using ( is_admin() );
 
 -- Feature Flags

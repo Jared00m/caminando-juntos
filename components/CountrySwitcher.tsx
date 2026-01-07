@@ -48,7 +48,7 @@ export function CountrySwitcher() {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+        className="flex items-center space-x-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
       >
         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -61,14 +61,14 @@ export function CountrySwitcher() {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 z-50 mt-1 w-64 rounded-md border bg-popover p-1 shadow-md">
+        <div className="absolute top-full left-0 z-50 mt-1 w-64 rounded-md border border-gray-200 bg-white p-1 shadow-lg">
           <div className="max-h-60 overflow-y-auto">
             {regions.map((region) => (
               <button
                 key={region.country_code}
                 onClick={() => handleCountryChange(region.country_code)}
-                className={`w-full text-left px-2 py-1.5 text-sm rounded hover:bg-accent hover:text-accent-foreground ${
-                  currentCountry === region.country_code ? 'bg-accent text-accent-foreground' : ''
+                className={`w-full text-left px-2 py-1.5 text-sm rounded hover:bg-blue-50 hover:text-blue-600 ${
+                  currentCountry === region.country_code ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
                 }`}
               >
                 {region.country_name}
