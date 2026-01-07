@@ -68,6 +68,7 @@ export async function proxy(request: NextRequest) {
     if (!countryCode) {
       countryCode = getDefaultCountryCode()
     }
+    console.log('[Proxy] Setting country from IP:', { headerCountry, resolved: countryCode })
     response.cookies.set('cc', countryCode, {
       maxAge: 60 * 60 * 24 * 30,
       httpOnly: false,
@@ -78,6 +79,7 @@ export async function proxy(request: NextRequest) {
 
   const country = existingCountry || headerCountry || getDefaultCountryCode()
   const locale = country === 'BR' ? 'pt' : 'es'
+  console.log('[Proxy] Country/Locale:', { country, locale, fromCookie: !!existingCountry, fromIP: !!headerCountry })
 
   const currentLocale = request.cookies.get('NEXT_LOCALE')?.value
   if (currentLocale !== locale) {
