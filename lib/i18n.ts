@@ -176,6 +176,60 @@ export const dictionaries = {
         button2: 'Leer artículos primero',
       },
     },
+    gospel: {
+      videoId: 'StGMC-KdehE',
+      title: '¿Qué es el Evangelio?',
+      subtitle: 'Descubre el mensaje central de la fe cristiana: las buenas noticias que cambian vidas',
+      problem: {
+        title: 'El Problema',
+        description: 'Todos hemos pecado y estamos separados de Dios. Por nuestros propios esfuerzos, no podemos alcanzar la perfección que Dios requiere.',
+        verse: '"Por cuanto todos pecaron, y están destituidos de la gloria de Dios" - Romanos 3:23',
+      },
+      solution: {
+        title: 'La Solución',
+        description: 'Dios nos amó tanto que envió a su Hijo Jesús a morir en la cruz por nuestros pecados. A través de Su sacrificio, podemos ser perdonados y reconciliados con Dios.',
+        verse: '"Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito" - Juan 3:16',
+      },
+      response: {
+        title: 'Nuestra Respuesta',
+        description: 'Para recibir este regalo de salvación, debemos arrepentirnos de nuestros pecados, creer en Jesús, y seguirle como Señor de nuestras vidas.',
+        verse: '"Si confiesas con tu boca que Jesús es el Señor... serás salvo" - Romanos 10:9',
+      },
+      cta: {
+        title: '¿Listo para dar el siguiente paso?',
+        subtitle: 'Explora cómo puedes crecer en tu fe y conectar con una comunidad',
+        firstSteps: 'Primeros Pasos',
+        studies: 'Ver Estudios Bíblicos',
+        findChurch: 'Encuentra una Iglesia',
+      },
+    },
+    whoIsJesus: {
+      videoId: 'GDGYKfpyiU8',
+      title: '¿Quién es Jesús?',
+      subtitle: 'Conoce al Hijo de Dios que vino a cambiar tu vida para siempre',
+      deity: {
+        title: 'Dios Hecho Hombre',
+        description: 'Jesús no fue solo un buen maestro o profeta. Él es Dios mismo que se hizo hombre para vivir entre nosotros, mostrando el amor perfecto del Padre.',
+        verse: '"En el principio existía el Verbo... y el Verbo era Dios" - Juan 1:1',
+      },
+      purpose: {
+        title: 'Su Misión',
+        description: 'Jesús vino a la tierra con un propósito: rescatarnos del pecado y restaurar nuestra relación con Dios a través de su sacrificio en la cruz.',
+        verse: '"El Hijo del Hombre vino a buscar y a salvar lo que se había perdido" - Lucas 19:10',
+      },
+      victory: {
+        title: 'Vivo y Reinando',
+        description: 'Jesús no se quedó en la tumba. Resucitó al tercer día, venciendo la muerte y el pecado. Hoy está vivo, reinando y ofreciendo vida eterna a todos los que creen en Él.',
+        verse: '"Yo soy... el que vivo, y estuve muerto; mas he aquí que vivo por los siglos de los siglos" - Apocalipsis 1:18',
+      },
+      cta: {
+        title: '¿Quieres conocer más a Jesús?',
+        subtitle: 'Descubre cómo puedes tener una relación personal con Él',
+        gospel: '¿Qué es el Evangelio?',
+        studies: 'Estudios sobre Jesús',
+        findChurch: 'Encuentra una Iglesia',
+      },
+    },
   },
   pt: {
     common: {
@@ -348,6 +402,60 @@ export const dictionaries = {
         description: 'Se é sua primeira vez estudando a Bíblia, recomendamos começar com "Conhecendo a Jesus". Este estudo lhe dará uma base sólida para entender quem é Jesus e por que ele é importante para sua vida.',
         button1: 'Começar com "O Plano de Salvação"',
         button2: 'Ler artigos primeiro',
+      },
+    },
+    gospel: {
+      videoId: '18B-21odNpY',
+      title: 'O que é o Evangelho?',
+      subtitle: 'Descubra a mensagem central da fé cristã: as boas novas que mudam vidas',
+      problem: {
+        title: 'O Problema',
+        description: 'Todos nós pecamos e estamos separados de Deus. Por nossos próprios esforços, não podemos alcançar a perfeição que Deus requer.',
+        verse: '"Pois todos pecaram e estão destituídos da glória de Deus" - Romanos 3:23',
+      },
+      solution: {
+        title: 'A Solução',
+        description: 'Deus nos amou tanto que enviou seu Filho Jesus para morrer na cruz por nossos pecados. Através de Seu sacrifício, podemos ser perdoados e reconciliados com Deus.',
+        verse: '"Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito" - João 3:16',
+      },
+      response: {
+        title: 'Nossa Resposta',
+        description: 'Para receber este presente de salvação, devemos nos arrepender de nossos pecados, crer em Jesus e segui-lo como Senhor de nossas vidas.',
+        verse: '"Se você confessar com a sua boca que Jesus é Senhor... será salvo" - Romanos 10:9',
+      },
+      cta: {
+        title: 'Pronto para dar o próximo passo?',
+        subtitle: 'Explore como você pode crescer em sua fé e se conectar com uma comunidade',
+        firstSteps: 'Primeiros Passos',
+        studies: 'Ver Estudos Bíblicos',
+        findChurch: 'Encontre uma Igreja',
+      },
+    },
+     whoIsJesus: {
+      videoId: 'dknI8gax1eA',
+      title: 'Quem é Jesus?',
+      subtitle: 'Conheça o Filho de Deus que veio para mudar sua vida para sempre',
+      deity: {
+        title: 'Deus Feito Homem',
+        description: 'Jesus não foi apenas um bom mestre ou profeta. Ele é o próprio Deus que se fez homem para viver entre nós, mostrando o amor perfeito do Pai.',
+        verse: '"No princípio era o Verbo... e o Verbo era Deus" - João 1:1',
+      },
+      purpose: {
+        title: 'Sua Missão',
+        description: 'Jesus veio à terra com um propósito: nos resgatar do pecado e restaurar nosso relacionamento com Deus através de seu sacrifício na cruz.',
+        verse: '"O Filho do Homem veio buscar e salvar o que estava perdido" - Lucas 19:10',
+      },
+      victory: {
+        title: 'Vivo e Reinando',
+        description: 'Jesus não ficou no túmulo. Ele ressuscitou no terceiro dia, vencendo a morte e o pecado. Hoje Ele está vivo, reinando e oferecendo vida eterna a todos que creem nEle.',
+        verse: '"Eu sou... aquele que vive; estive morto, mas eis que estou vivo pelos séculos dos séculos" - Apocalipse 1:18',
+      },
+      cta: {
+        title: 'Quer conhecer mais sobre Jesus?',
+        subtitle: 'Descubra como você pode ter um relacionamento pessoal com Ele',
+        gospel: 'O que é o Evangelho?',
+        studies: 'Estudos sobre Jesus',
+        findChurch: 'Encontre uma Igreja',
       },
     },
   },
