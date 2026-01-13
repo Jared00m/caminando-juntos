@@ -89,10 +89,10 @@ function TakeAway({ children }: any) {
   return (
     <div className="my-12 bg-gradient-to-br from-blue-600 to-blue-700 text-white p-8 rounded-2xl shadow-xl">
       <h3 className="text-2xl font-bold mb-4 flex items-center gap-3">
-        <span className="text-3xl">💡</span>
+        <span className="text-3xl text-white">💡</span>
         Para Recordar
       </h3>
-      <div className="text-lg leading-relaxed text-blue-50">
+      <div className="text-lg leading-relaxed text-white">
         {children}
       </div>
     </div>
@@ -115,15 +115,27 @@ function Question({ children }: any) {
   )
 }
 
-function YouTube({ id }: any) {
+function YouTube({ id, title, caption }: { id: string; title?: string; caption?: React.ReactNode }) {
+  const embedUrl = `https://www.youtube.com/embed/${id}?modestbranding=1&rel=0`
+
   return (
-    <div className="my-6 relative w-full" style={{ paddingBottom: '56.25%' }}>
-      <iframe
-        className="absolute top-0 left-0 w-full h-full rounded-lg"
-        src={`https://www.youtube.com/embed/${id}`}
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-      />
+    <div className="my-8">
+      <div className="shadow-[0_22px_68px_-22px_rgba(15,23,42,0.55),0_10px_32px_-16px_rgba(15,23,42,0.35)] rounded-xl overflow-hidden">
+        <div className="relative aspect-video bg-black">
+          <iframe
+            className="absolute inset-0 h-full w-full"
+            src={embedUrl}
+            title={title || 'Video de YouTube'}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+      </div>
+      {caption && (
+        <div className="mt-3 text-xs text-gray-600">
+          {caption}
+        </div>
+      )}
     </div>
   )
 }
@@ -154,7 +166,7 @@ export const mdxComponents = {
   
   // Paragraphs and text
   p: ({ children }: any) => (
-    <p className="mb-4 leading-relaxed text-gray-700">{children}</p>
+    <p className="mb-4 leading-relaxed text-inherit">{children}</p>
   ),
   
   // Lists

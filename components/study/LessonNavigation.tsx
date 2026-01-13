@@ -1,9 +1,12 @@
+
 'use client'
 
 import Link from 'next/link'
+import { getDictionary, type Locale } from '@/lib/i18n'
 
 interface LessonNavigationProps {
   studyId: string
+  locale: Locale
   previousLesson?: {
     lesson: string
     title: string
@@ -14,7 +17,8 @@ interface LessonNavigationProps {
   }
 }
 
-export function LessonNavigation({ studyId, previousLesson, nextLesson }: LessonNavigationProps) {
+export function LessonNavigation({ studyId, previousLesson, nextLesson, locale }: LessonNavigationProps) {
+  const d = getDictionary(locale)
   return (
     <div className="flex items-center justify-between gap-4 bg-white rounded-2xl p-6 shadow-lg border border-border">
       {previousLesson ? (
@@ -26,7 +30,7 @@ export function LessonNavigation({ studyId, previousLesson, nextLesson }: Lesson
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
           <div className="text-left">
-            <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Anterior</div>
+            <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">{d.studies.previous}</div>
             <div className="text-sm font-semibold text-deep-indigo group-hover:text-celestial-blue transition-colors">
               {previousLesson.title}
             </div>
@@ -42,7 +46,7 @@ export function LessonNavigation({ studyId, previousLesson, nextLesson }: Lesson
           className="group flex items-center space-x-3 px-6 py-3 rounded-xl border-2 border-border hover:border-emerald-green hover:bg-emerald-green/5 transition-all"
         >
           <div className="text-right">
-            <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Siguiente</div>
+            <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">{d.studies.next}</div>
             <div className="text-sm font-semibold text-deep-indigo group-hover:text-emerald-green transition-colors">
               {nextLesson.title}
             </div>

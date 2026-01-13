@@ -6,6 +6,8 @@ import { MDXRenderer } from '@/lib/mdx-renderer'
 import { Metadata } from 'next'
 import { ArticleStructuredData, BreadcrumbStructuredData } from '@/components/StructuredData'
 import { cookies } from 'next/headers'
+import { Hero } from '@/components/Hero'
+import { getDictionary, type Locale } from '@/lib/i18n'
 
 interface LessonPageProps {
   params: Promise<{
@@ -17,7 +19,8 @@ interface LessonPageProps {
 export async function generateMetadata({ params }: LessonPageProps): Promise<Metadata> {
   const { study, lesson } = await params
   const cookieStore = await cookies()
-  const locale = cookieStore.get('NEXT_LOCALE')?.value || 'es'
+  const cookieLocale = cookieStore.get('NEXT_LOCALE')?.value || 'es'
+  const locale: Locale = cookieLocale === 'pt' ? 'pt' : 'es'
   
   const [lessonData, studyMetadata] = await Promise.all([
     getStudyLesson(study, lesson, locale),
@@ -36,8 +39,16 @@ export async function generateMetadata({ params }: LessonPageProps): Promise<Met
 
   return {
     title: `${lessonData.title} - ${studyTitle} | Caminando Juntos`,
-    description: lessonData.description || `Estudia ${lessonData.title} en el curso de ${studyTitle}`,
-    keywords: lessonData.tags || ['estudio bíblico', 'lección', studyTitle],
+    description:
+      lessonData.description ||
+      (locale === 'pt'
+        ? `Estude ${lessonData.title} no curso ${studyTitle}`
+        : `Estudia ${lessonData.title} en el curso de ${studyTitle}`),
+    keywords:
+      lessonData.tags ||
+      (locale === 'pt'
+        ? ['estudo bíblico', 'lição', studyTitle]
+        : ['estudio bíblico', 'lección', studyTitle]),
     openGraph: {
       type: 'article',
       locale: locale === 'pt' ? 'pt_BR' : 'es_ES',
@@ -65,9 +76,11 @@ export async function generateMetadata({ params }: LessonPageProps): Promise<Met
 }
 
 export default async function LessonPage({ params }: LessonPageProps) {
-  const { study, lesson } = await params
+  const { study, lesson, } = await params
   const cookieStore = await cookies()
-  const locale = cookieStore.get('NEXT_LOCALE')?.value || 'es'
+  const cookieLocale = cookieStore.get('NEXT_LOCALE')?.value || 'es'
+  const locale: Locale = cookieLocale === 'pt' ? 'pt' : 'es'
+  const d = getDictionary(locale)
   
   const lessonData = await getStudyLesson(study, lesson, locale)
   const allLessons = await getStudyLessons(study, locale)
@@ -97,62 +110,32 @@ export default async function LessonPage({ params }: LessonPageProps) {
       />
       <BreadcrumbStructuredData
         items={[
-          { name: 'Inicio', url: 'https://cjuntos.org' },
-          { name: 'Estudios', url: 'https://cjuntos.org/estudios' },
+          { name: d.common.home, url: 'https://cjuntos.org' },
+          { name: d.common.studies, url: 'https://cjuntos.org/estudios' },
           { name: studyTitle, url: `https://cjuntos.org/estudios/${study}` },
           { name: lessonData.title, url: `https://cjuntos.org/estudios/${study}/${lesson}` },
         ]}
       />
-      <div className="container mx-auto px-4 py-12">
+      {/* Study Hero Section - Full Width */}
+      <Hero title={lessonData.title} />
+
+      <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Breadcrumb Navigation */}
-          <nav className="flex items-center space-x-2 text-sm mb-8">
+          <nav className="flex items-center space-x-2 text-sm">
             <Link href="/estudios" className="text-celestial-blue hover:text-celestial-blue/80 transition-colors">
-              Estudios
+              {d.common.studies}
             </Link>
             <span className="text-muted-foreground">/</span>
             <Link href={`/estudios/${study}`} className="text-celestial-blue hover:text-celestial-blue/80 transition-colors">
               {studyTitle}
             </Link>
             <span className="text-muted-foreground">/</span>
-            <span className="text-muted-foreground">Lección {currentIndex + 1}</span>
+            <span className="text-muted-foreground">{lessonData.title}</span>
           </nav>
 
-          {/* Lesson Header */}
-          <div className="mb-12 bg-white rounded-3xl p-10 shadow-xl border border-border">
-            <div className="flex items-center mb-4">
-              <span className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-emerald-green to-celestial-blue rounded-2xl text-white font-bold text-xl shadow-lg">
-                {currentIndex + 1}
-              </span>
-              <div className="ml-6">
-                <h1 className="text-4xl md:text-5xl font-bold text-deep-indigo">
-                  {lessonData.title}
-                </h1>
-              </div>
-            </div>
-
-            {lessonData.description && (
-              <p className="text-xl text-muted-foreground leading-relaxed mt-6">
-                {lessonData.description}
-              </p>
-            )}
-
-            {lessonData.tags && lessonData.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-6">
-                {lessonData.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="bg-emerald-green/10 text-emerald-green px-4 py-2 rounded-full text-sm font-medium"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-
           {/* Lesson Content */}
-          <article className="mb-12">
+          <article>
             <MDXRenderer content={lessonData.content} />
           </article>
 
@@ -160,6 +143,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
           <div className="mb-12">
             <LessonNavigation
               studyId={study}
+              locale={locale}
               previousLesson={previousLesson ? {
                 lesson: previousLesson.lesson,
                 title: previousLesson.title
@@ -180,7 +164,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              Ver todas las lecciones
+              {d.studies.viewLessons}
             </Link>
           </div>
         </div>

@@ -96,13 +96,27 @@ export interface Video extends ContentFrontmatter {
   youtube_id: string
 }
 
-export interface StudyContent extends ContentFrontmatter {
+export interface LessonFrontmatter {
+  // Required
+  title: string
+  date: string
+  order: number
+  description: string
+  // Recommended
+  tags?: string[]
+  steps?: number
+  episode?: number
+  // Optional metadata
+  author?: string
+  duration?: string
+  cover?: string
+}
+
+export interface StudyContent extends LessonFrontmatter {
   slug: string
   content: string
   study: string
   lesson: string
-  order?: number
-  steps?: number
 }
 
 export interface StudyMetadata {

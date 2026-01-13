@@ -169,6 +169,8 @@ export const dictionaries = {
       },
       lessons: 'lecciones',
       viewLessons: 'Ver lecciones',
+      previous: 'Anterior',
+      next: 'Siguiente',
       cta: {
         title: '¿Nuevo en los estudios bíblicos?',
         description: 'Si es tu primera vez estudiando la Biblia, te recomendamos comenzar con "Conociendo a Jesús". Este estudio te dará una base sólida para entender quién es Jesús y por qué es importante para tu vida.',
@@ -397,6 +399,8 @@ export const dictionaries = {
       },
       lessons: 'lições',
       viewLessons: 'Ver lições',
+      previous: 'Anterior',
+      next: 'Próxima',
       cta: {
         title: 'Novo nos estudos bíblicos?',
         description: 'Se é sua primeira vez estudando a Bíblia, recomendamos começar com "Conhecendo a Jesus". Este estudo lhe dará uma base sólida para entender quem é Jesus e por que ele é importante para sua vida.',

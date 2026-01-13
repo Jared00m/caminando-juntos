@@ -2,9 +2,68 @@ import fs from 'fs/promises'
 import path from 'path'
 import matter from 'gray-matter'
 import { compile } from '@mdx-js/mdx'
-import { Article, Video, StudyContent, ContentFrontmatter, StudyMetadata } from './types'
+import { Article, Video, StudyContent, ContentFrontmatter, StudyMetadata, LessonFrontmatter } from './types'
 
 const CONTENT_DIR = path.join(process.cwd(), 'content')
+
+function normalizeLocale(locale: string): 'es' | 'pt' {
+  return locale === 'pt' ? 'pt' : 'es'
+}
+
+function validateStudyMetadata(meta: any): StudyMetadata {
+  const safeString = (v: any, fallback = '') => (typeof v === 'string' ? v : fallback)
+  const safeNumber = (v: any) => (typeof v === 'number' ? v : undefined)
+  const safeStringArray = (v: any) => (Array.isArray(v) ? v.filter((x) => typeof x === 'string') : undefined)
+
+  const validated: StudyMetadata = {
+    title: safeString(meta?.title),
+    slug: safeString(meta?.slug),
+    description: safeString(meta?.description),
+    level: safeString(meta?.level) || undefined,
+    lessons: safeNumber(meta?.lessons),
+    estimatedTime: safeString(meta?.estimatedTime) || undefined,
+    tags: safeStringArray(meta?.tags),
+    thumbnail: safeString(meta?.thumbnail) || undefined,
+    order: safeNumber(meta?.order),
+  }
+
+  if (!validated.title || !validated.slug || !validated.description) {
+    console.warn('Study metadata missing required fields:', { title: validated.title, slug: validated.slug, description: validated.description })
+  }
+  return validated
+}
+
+function validateLessonFrontmatter(data: any, lessonPath: string): LessonFrontmatter {
+  const safeString = (v: any, fallback = '') => (typeof v === 'string' ? v : fallback)
+  const safeNumber = (v: any) => (typeof v === 'number' ? v : undefined)
+  const safeStringArray = (v: any) => (Array.isArray(v) ? v.filter((x) => typeof x === 'string') : undefined)
+
+  const validated: LessonFrontmatter = {
+    title: safeString(data?.title),
+    date: safeString(data?.date),
+    order: safeNumber(data?.order) || 0,
+    description: safeString(data?.description),
+    tags: safeStringArray(data?.tags),
+    steps: safeNumber(data?.steps),
+    episode: safeNumber(data?.episode),
+    author: safeString(data?.author) || undefined,
+    duration: safeString(data?.duration) || undefined,
+    cover: safeString(data?.cover) || undefined,
+  }
+
+  // Validate required fields
+  const missing = []
+  if (!validated.title) missing.push('title')
+  if (!validated.date) missing.push('date')
+  if (validated.order === undefined || validated.order === null) missing.push('order')
+  if (!validated.description) missing.push('description')
+
+  if (missing.length > 0) {
+    console.warn(`Lesson ${lessonPath} missing required frontmatter fields:`, missing)
+  }
+
+  return validated
+}
 
 /**
  * Get all articles from the content directory
@@ -185,8 +244,8 @@ export async function getStudyMetadata(study: string, locale: string = 'es'): Pr
   try {
     const studyDir = path.join(CONTENT_DIR, 'estudios', study)
     let filename = 'index.json'
-    
-    if (locale !== 'es') {
+    const loc = normalizeLocale(locale)
+    if (loc !== 'es') {
       const localizedFile = `index.${locale}.json`
       try {
         await fs.access(path.join(studyDir, localizedFile))
@@ -198,7 +257,8 @@ export async function getStudyMetadata(study: string, locale: string = 'es'): Pr
 
     const metadataPath = path.join(studyDir, filename)
     const metadataContent = await fs.readFile(metadataPath, 'utf8')
-    return JSON.parse(metadataContent) as StudyMetadata
+    const raw = JSON.parse(metadataContent)
+    return validateStudyMetadata(raw)
   } catch (error) {
     console.error(`Error reading study metadata for ${study}:`, error)
     return null
@@ -214,11 +274,11 @@ export async function getStudiesWithMetadata(locale: string = 'es'): Promise<Stu
     const metadata = await Promise.all(
       studies.map(async (study) => {
         const meta = await getStudyMetadata(study, locale)
-        return meta || {
+        return meta || validateStudyMetadata({
           title: study.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
           slug: study,
           description: 'Un estudio bíblico para profundizar en tu fe.',
-        }
+        })
       })
     )
     // Sort by order if provided
@@ -258,13 +318,14 @@ export async function getStudyLessons(study: string, locale: string = 'es'): Pro
         const fullPath = path.join(studyDir, filename)
         const fileContent = await fs.readFile(fullPath, 'utf8')
         const { data, content } = matter(fileContent)
+        const validatedFrontmatter = validateLessonFrontmatter(data, `${study}/${lessonSlug}`)
         
         return {
           slug: lessonSlug,
           content,
           study,
           lesson: lessonSlug,
-          ...data,
+          ...validatedFrontmatter,
         } as StudyContent
       })
     )
@@ -298,13 +359,14 @@ export async function getStudyLesson(study: string, lesson: string, locale: stri
     const filePath = path.join(studyDir, filename)
     const fileContent = await fs.readFile(filePath, 'utf8')
     const { data, content } = matter(fileContent)
+    const validatedFrontmatter = validateLessonFrontmatter(data, `${study}/${lesson}`)
     
     return {
       slug: lesson,
       content,
       study,
       lesson,
-      ...data,
+      ...validatedFrontmatter,
     } as StudyContent
   } catch (error) {
     console.error(`Error reading lesson ${lesson} in study ${study}:`, error)
