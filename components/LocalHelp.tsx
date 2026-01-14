@@ -83,8 +83,8 @@ export function LocalHelp() {
   const handleContactClick = (contact: Contact) => {
     if (contact.channel_type === 'chatwoot_team') {
       // Trigger Chatwoot widget
-      if (typeof window !== 'undefined' && (window as any).$chatwoot) {
-        (window as any).$chatwoot.toggle()
+      if (typeof window !== 'undefined' && window.$chatwoot) {
+        window.$chatwoot.toggle()
       }
     }
   }

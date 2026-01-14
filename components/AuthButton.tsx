@@ -149,9 +149,12 @@ function AuthModal({ isSignUp, onClose, onToggleMode, dictionary }: AuthModalPro
         await new Promise(resolve => setTimeout(resolve, 500))
         onClose()
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Translate common Supabase error messages to Spanish
-      const errorMessage = err.message || m?.errors.generic || 'Ocurrió un error'
+      const errorMessage =
+        (typeof err === 'object' && err !== null && 'message' in err)
+          ? String((err as { message: unknown }).message)
+          : (m?.errors.generic || 'Ocurrió un error')
       let translatedError = errorMessage
       
       if (errorMessage.includes('Email not confirmed')) {

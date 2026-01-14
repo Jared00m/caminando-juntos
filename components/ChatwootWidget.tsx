@@ -10,11 +10,11 @@ declare global {
       toggle: () => void
       hide: () => void
       show: () => void
-      setUser: (user: any) => void
-      setCustomAttributes: (attributes: any) => void
+      setUser: (user: Record<string, unknown>) => void
+      setCustomAttributes: (attributes: Record<string, unknown>) => void
     }
     chatwootSDK: {
-      run: (config: any) => void
+      run: (config: { websiteToken: string; baseUrl: string }) => void
     }
   }
 }
@@ -53,7 +53,7 @@ export function ChatwootWidget() {
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [chatwootBaseUrl, chatwootToken])
 
   if (!chatwootToken || !chatwootBaseUrl) {
     return null

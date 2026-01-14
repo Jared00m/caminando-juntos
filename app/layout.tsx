@@ -11,6 +11,8 @@ import { getDictionary, Locale } from '@/lib/i18n'
 import { CountrySwitcher } from '@/components/CountrySwitcher'
 import { MobileNav } from '@/components/MobileNav'
 import { NavDropdown } from '@/components/NavDropdown'
+import Link from 'next/link'
+import Image from 'next/image'
 
 export async function generateMetadata(): Promise<Metadata> {
   const cookieStore = await cookies()
@@ -90,16 +92,19 @@ export default async function RootLayout({
             <div className="container mx-auto px-4">
               <div className="flex h-16 items-center justify-between">
                 {/* Logo */}
-                <a className="flex items-center gap-2 group" href="/">
-                  <img 
-                    src="/logo.png" 
-                    alt="Caminando Juntos" 
+                <Link className="flex items-center gap-2 group" href="/">
+                  <Image
+                    src="/logo.png"
+                    alt="Caminando Juntos"
+                    width={180}
+                    height={72}
                     className="h-9 w-auto transition-transform group-hover:scale-105"
+                    priority
                   />
                   <span className="hidden md:block text-lg font-bold text-gray-800">
                     Caminando Juntos
                   </span>
-                </a>
+                </Link>
 
                 {/* Desktop Navigation */}
                 <nav className="hidden lg:flex items-center gap-6">

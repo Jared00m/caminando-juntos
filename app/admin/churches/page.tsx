@@ -1,5 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
-
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
@@ -212,7 +210,11 @@ export default function ChurchesAdmin() {
 					<label className="block text-sm font-medium mb-1">Phone Type</label>
 					<select
 						value={formData.contact_phone_type || ''}
-						onChange={(e) => setFormData({ ...formData, contact_phone_type: (e.target.value || null) as any })}
+						onChange={(e) => {
+							const raw = e.target.value
+							const nextType: ChurchForm['contact_phone_type'] = raw === 'whatsapp' || raw === 'phone' ? raw : null
+							setFormData({ ...formData, contact_phone_type: nextType })
+						}}
 						className="border rounded p-2 w-full"
 						disabled={!formData.contact_phone}
 					>

@@ -3,6 +3,7 @@ import { Only } from '@/components/Only'
 import { isEnabled } from '@/lib/featureFlags'
 import { cookies } from 'next/headers'
 import { getDictionary, Locale } from '@/lib/i18n'
+import Link from 'next/link'
 
 export default async function HelpPage() {
   const cookieStore = await cookies()
@@ -86,12 +87,12 @@ export default async function HelpPage() {
             {dict.help.unavailable.description}
           </p>
           <div className="mt-8">
-            <a
+            <Link
               href="/estudios"
               className="inline-flex items-center px-8 py-4 border-2 border-transparent shadow-lg text-base font-semibold rounded-lg text-white bg-celestial-blue hover:bg-celestial-blue/90 hover:scale-105 transition-all"
             >
               {dict.help.unavailable.cta}
-            </a>
+            </Link>
           </div>
         </div>
       </Only>

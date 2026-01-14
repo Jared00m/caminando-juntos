@@ -1,9 +1,10 @@
 'use client'
 
 import { useAuth } from '@/lib/auth-context'
+import Link from 'next/link'
 
 export default function AdminDashboard() {
-  const { user, isAdmin, isLoading } = useAuth()
+  const { isLoading, user } = useAuth()
 
   if (isLoading) {
     return (
@@ -22,17 +23,31 @@ export default function AdminDashboard() {
       
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+          <div className="text-3xl mb-2">✉️</div>
+          <h2 className="text-xl font-semibold mb-2">Decisions</h2>
+          <p className="text-gray-600 text-sm mb-4">
+            View gospel decision form submissions
+          </p>
+          <Link
+            href="/admin/decisions"
+            className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+          >
+            View →
+          </Link>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
           <div className="text-3xl mb-2">🏙️</div>
           <h2 className="text-xl font-semibold mb-2">Cities</h2>
           <p className="text-gray-600 text-sm mb-4">
             Manage city locations and regions
           </p>
-          <a
+          <Link
             href="/admin/cities"
             className="text-blue-600 hover:text-blue-700 font-medium text-sm"
           >
             Manage →
-          </a>
+          </Link>
         </div>
         
         <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
@@ -41,12 +56,12 @@ export default function AdminDashboard() {
           <p className="text-gray-600 text-sm mb-4">
             Manage missionaries and contacts
           </p>
-          <a
+          <Link
             href="/admin/contacts"
             className="text-blue-600 hover:text-blue-700 font-medium text-sm"
           >
             Manage →
-          </a>
+          </Link>
         </div>
         
         <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
@@ -55,12 +70,12 @@ export default function AdminDashboard() {
           <p className="text-gray-600 text-sm mb-4">
             Create and manage community events
           </p>
-          <a
+          <Link
             href="/admin/events"
             className="text-blue-600 hover:text-blue-700 font-medium text-sm"
           >
             Manage →
-          </a>
+          </Link>
         </div>
 
         <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
@@ -69,12 +84,12 @@ export default function AdminDashboard() {
           <p className="text-gray-600 text-sm mb-4">
             Add and manage local churches
           </p>
-          <a
+          <Link
             href="/admin/churches"
             className="text-blue-600 hover:text-blue-700 font-medium text-sm"
           >
             Manage →
-          </a>
+          </Link>
         </div>
       </div>
       

@@ -2,24 +2,14 @@
 
 import { useState, useEffect } from 'react'
 import Cookies from 'js-cookie'
-import { getRegions } from '@/lib/supabase-server'
 import { Region } from '@/lib/types'
 
 export function CountrySwitcher() {
-  const [currentCountry, setCurrentCountry] = useState<string>('')
+  const [currentCountry, setCurrentCountry] = useState<string>(() => Cookies.get('cc') || 'ES')
   const [regions, setRegions] = useState<Region[]>([])
   const [isOpen, setIsOpen] = useState(false)
 
-  useEffect(() => {
-    // Get current country from cookie
-    const country = Cookies.get('cc') || 'ES'
-    setCurrentCountry(country)
-
-    // Load regions
-    loadRegions()
-  }, [])
-
-  const loadRegions = async () => {
+  async function loadRegions() {
     try {
       const response = await fetch('/api/regions')
       const data = await response.json()
@@ -28,6 +18,11 @@ export function CountrySwitcher() {
       console.error('Error loading regions:', error)
     }
   }
+
+  useEffect(() => {
+    // Load regions
+    loadRegions()
+  }, [])
 
   const handleCountryChange = (countryCode: string) => {
     setCurrentCountry(countryCode)

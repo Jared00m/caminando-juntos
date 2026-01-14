@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import { ArticleStructuredData, BreadcrumbStructuredData } from '@/components/StructuredData'
 import { cookies } from 'next/headers'
+import Link from 'next/link'
+import Image from 'next/image'
 
 interface ArticlePageProps {
   params: Promise<{
@@ -88,11 +90,13 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         {/* Header */}
         <header className="mb-8">
           {article.cover && (
-            <div className="aspect-video mb-8 rounded-lg overflow-hidden">
-              <img
+            <div className="relative aspect-video mb-8 rounded-lg overflow-hidden">
+              <Image
                 src={article.cover}
                 alt={article.title}
-                className="w-full h-full object-cover"
+                fill
+                sizes="(max-width: 768px) 100vw, 896px"
+                className="object-cover"
               />
             </div>
           )}
@@ -136,7 +140,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         {/* Footer */}
         <footer className="mt-12 pt-8 border-t">
           <div className="flex items-center justify-between">
-            <a
+            <Link
               href="/articulos"
               className="inline-flex items-center text-primary hover:text-primary/80"
             >
@@ -144,16 +148,16 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
               Volver a artículos
-            </a>
+            </Link>
             
             <div className="flex items-center space-x-4">
               <span className="text-sm text-muted-foreground">¿Te gustó este artículo?</span>
-              <a
+              <Link
                 href="/estudios"
                 className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
               >
                 Continúa con estudios
-              </a>
+              </Link>
             </div>
           </div>
         </footer>

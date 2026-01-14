@@ -178,6 +178,16 @@ create table if not exists study_questions(
   updated_at timestamptz default now()
 );
 
+-- Gospel presentation decisions (lead capture)
+create table if not exists gospel_decisions(
+  id bigserial primary key,
+  name text not null,
+  email text not null,
+  locale text,
+  page_path text,
+  created_at timestamptz default now()
+);
+
 -- User profiles
 create table if not exists user_profiles(
   id uuid references auth.users(id) on delete cascade primary key,
@@ -301,6 +311,7 @@ alter table cities enable row level security;
 alter table events enable row level security;
 alter table contacts enable row level security;
 alter table churches enable row level security;
+alter table gospel_decisions enable row level security;
 alter table study_progress enable row level security;
 alter table study_notes enable row level security;
 alter table study_questions enable row level security;

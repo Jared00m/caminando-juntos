@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
 
 interface ProgressControlsProps {
@@ -14,11 +14,7 @@ export function ProgressControls({ step, studyId, lessonId }: ProgressControlsPr
   const [isCompleted, setIsCompleted] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    checkProgress()
-  }, [step, studyId, lessonId, userId])
-
-  const checkProgress = async () => {
+  const checkProgress = useCallback(async () => {
     if (!studyId || !lessonId) return
 
     try {
@@ -29,14 +25,18 @@ export function ProgressControls({ step, studyId, lessonId }: ProgressControlsPr
         lessonId,
         step: step.toString(),
       })
-      
+
       const response = await fetch(`/api/study-progress?${params}`)
       const data = await response.json()
       setIsCompleted(data.completed)
     } catch (error) {
       console.error('Error checking progress:', error)
     }
-  }
+  }, [isAuthenticated, lessonId, step, studyId, userId])
+
+  useEffect(() => {
+    checkProgress()
+  }, [checkProgress])
 
   const markCompleted = async () => {
     if (!studyId || !lessonId) return

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { AuthButton } from './AuthButton'
 import { CountrySwitcher } from './CountrySwitcher'
 
@@ -140,18 +141,18 @@ export function MobileNav({ dictionary }: MobileNavProps) {
               </button>
               {expandedSection === 'start-here' && (
                 <div className="bg-gray-50">
-                  <a href="/comienza-aqui/que-es-el-evangelio" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
+                  <Link href="/comienza-aqui/que-es-el-evangelio" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
                     {dictionary.nav.whatIsGospel}
-                  </a>
-                  <a href="/comienza-aqui/quien-es-jesus" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
+                  </Link>
+                  <Link href="/comienza-aqui/quien-es-jesus" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
                     {dictionary.nav.whoIsJesus}
-                  </a>
-                  <a href="/comienza-aqui/testimonios" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
+                  </Link>
+                  <Link href="/comienza-aqui/testimonios" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
                     {dictionary.nav.testimonies}
-                  </a>
-                  <a href="/comienza-aqui/primeros-pasos" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
+                  </Link>
+                  <Link href="/comienza-aqui/primeros-pasos" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
                     {dictionary.nav.firstSteps}
-                  </a>
+                  </Link>
                 </div>
               )}
             </div>
@@ -174,15 +175,15 @@ export function MobileNav({ dictionary }: MobileNavProps) {
               </button>
               {expandedSection === 'go-deeper' && (
                 <div className="bg-gray-50">
-                  <a href="/estudios" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
+                  <Link href="/estudios" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
                     {dictionary.nav.bibleStudies}
-                  </a>
-                  <a href="/profundiza/apologetica" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
+                  </Link>
+                  <Link href="/profundiza/apologetica" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
                     {dictionary.nav.apologetics}
-                  </a>
-                  <a href="/profundiza/comparte-tu-fe" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
+                  </Link>
+                  <Link href="/profundiza/comparte-tu-fe" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
                     {dictionary.nav.sharingFaith}
-                  </a>
+                  </Link>
                 </div>
               )}
             </div>
@@ -205,15 +206,15 @@ export function MobileNav({ dictionary }: MobileNavProps) {
               </button>
               {expandedSection === 'community' && (
                 <div className="bg-gray-50">
-                  <a href="/comunidad/encuentra-mentor" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
+                  <Link href="/comunidad/encuentra-mentor" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
                     {dictionary.nav.findMentor}
-                  </a>
-                  <a href="/comunidad/encuentra-iglesia" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
+                  </Link>
+                  <Link href="/comunidad/encuentra-iglesia" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
                     {dictionary.nav.findChurch}
-                  </a>
-                  <a href="/comunidad/chat" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
+                  </Link>
+                  <Link href="/comunidad/chat" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
                     {dictionary.nav.chat}
-                  </a>
+                  </Link>
                 </div>
               )}
             </div>
@@ -236,15 +237,15 @@ export function MobileNav({ dictionary }: MobileNavProps) {
               </button>
               {expandedSection === 'about' && (
                 <div className="bg-gray-50">
-                  <a href="/acerca-de/creencias" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
+                  <Link href="/acerca-de/creencias" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
                     {dictionary.nav.beliefs}
-                  </a>
-                  <a href="/acerca-de/quienes-somos" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
+                  </Link>
+                  <Link href="/acerca-de/quienes-somos" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
                     {dictionary.nav.whoWeAre}
-                  </a>
-                  <a href="/acerca-de/contacto" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
+                  </Link>
+                  <Link href="/acerca-de/contacto" onClick={() => setIsOpen(false)} className="block px-10 py-2 text-sm text-gray-600 hover:text-blue-600">
                     {dictionary.nav.contact}
-                  </a>
+                  </Link>
                 </div>
               )}
             </div>

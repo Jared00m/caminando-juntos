@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { createClient } from '@/lib/supabase-browser'
 import { Contact, City, Region } from '@/lib/types'
 
@@ -16,13 +16,9 @@ export default function ContactsAdmin() {
     published: true
   })
   
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
-  useEffect(() => {
-    fetchData()
-  }, [])
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true)
       const { data: regionsData, error: regionsError } = await supabase.from('regions').select('*')
@@ -42,7 +38,11 @@ export default function ContactsAdmin() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [supabase])
+
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -115,7 +115,12 @@ export default function ContactsAdmin() {
           <label className="block text-sm font-medium mb-1">Type</label>
           <select 
             value={formData.channel_type} 
-            onChange={(e) => setFormData({...formData, channel_type: e.target.value as any})}
+            onChange={(e) => {
+              const raw = e.target.value
+              const nextType: Contact['channel_type'] =
+                raw === 'email' || raw === 'whatsapp' || raw === 'phone' || raw === 'chatwoot_team' ? raw : 'email'
+              setFormData({ ...formData, channel_type: nextType })
+            }}
             className="border rounded p-2 w-full"
             required
           >

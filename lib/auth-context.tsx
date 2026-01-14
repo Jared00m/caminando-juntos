@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { User } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase-browser'
 import { v4 as uuidv4 } from 'uuid'
@@ -23,7 +23,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isAdmin, setIsAdmin] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   // Get or create anonymous ID
   const getOrCreateAnonId = (): string => {
@@ -38,23 +38,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const userId = user?.id || getOrCreateAnonId()
   const isAuthenticated = !!user
 
-  const checkAdmin = async (currentUser: User | null) => {
-
-    console.log('Checking admin status for user:', currentUser)
+  const checkAdmin = useCallback(async (currentUser: User | null) => {
     if (!currentUser) {
       setIsAdmin(false)
       return
     }
 
     try {
-      console.log('Fetching user role for user ID:', currentUser.id)
       const { data, error } = await supabase
         .from('user_profiles')
         .select('role')
         .eq('id', currentUser.id)
         .maybeSingle()
-
-      console.log('User role data:', data, 'Error:', error)
 
       if (error) {
         console.error('Failed to fetch user role:', error)
@@ -62,14 +57,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return
       }
 
-      console.log(data?.role === 'admin');
-
       setIsAdmin(data?.role === 'admin')
     } catch (err) {
       console.error('Unexpected error fetching user role:', err)
       setIsAdmin(false)
     }
-  }
+  }, [supabase])
 
   useEffect(() => {
     let isMounted = true
@@ -112,7 +105,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isMounted = false
       subscription.unsubscribe()
     }
-  }, [])
+  }, [checkAdmin, supabase])
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
@@ -122,7 +115,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signUp = async (email: string, password: string, displayName?: string) => {
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {

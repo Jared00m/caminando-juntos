@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers'
 import { dictionaries } from '@/lib/i18n'
+import Link from 'next/link'
 
 export default async function HomePage() {
   const cookieStore = await cookies()
@@ -128,15 +129,15 @@ export default async function HomePage() {
                   {dict.home.step2.description}
                 </p>
                 <div className="flex flex-wrap gap-4">
-                  <a href="/estudios" className="group inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-all hover:shadow-lg hover:scale-105">
+                  <Link href="/estudios" className="group inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-all hover:shadow-lg hover:scale-105">
                     <span>{dict.home.step2.cta}</span>
                     <svg className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
-                  </a>
-                  <a href="/profundiza/apologetica" className="inline-flex items-center px-6 py-3 bg-white border-2 border-green-600 text-green-600 rounded-lg font-semibold hover:bg-green-50 transition-all hover:shadow-md hover:scale-105">
+                  </Link>
+                  <Link href="/profundiza/apologetica" className="inline-flex items-center px-6 py-3 bg-white border-2 border-green-600 text-green-600 rounded-lg font-semibold hover:bg-green-50 transition-all hover:shadow-md hover:scale-105">
                     {dict.common.nav.apologetics}
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>

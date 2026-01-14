@@ -54,7 +54,13 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createClient()
     
-    const progressData: any = {
+    const progressData: {
+      study_id: string
+      lesson_id: string
+      step: number
+      user_id?: string
+      anon_id?: string
+    } = {
       study_id: studyId,
       lesson_id: lessonId,
       step: parseInt(step),

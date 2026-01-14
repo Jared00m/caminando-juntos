@@ -1,5 +1,6 @@
 import { getVideos } from '@/lib/content-git'
 import Link from 'next/link'
+import Image from 'next/image'
 import { cookies } from 'next/headers'
 
 export default async function VideosPage() {
@@ -38,16 +39,20 @@ export default async function VideosPage() {
             >
               <div className="aspect-video overflow-hidden relative bg-gradient-to-br from-sunrise-gold/10 to-emerald-green/10">
                 {video.cover ? (
-                  <img
+                  <Image
                     src={video.cover}
                     alt={video.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                 ) : video.youtube_id ? (
-                  <img
+                  <Image
                     src={`https://img.youtube.com/vi/${video.youtube_id}/hqdefault.jpg`}
                     alt={video.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-sunrise-gold/20 to-emerald-green/20 flex items-center justify-center">

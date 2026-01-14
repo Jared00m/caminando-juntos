@@ -31,7 +31,7 @@ export default function AdminLayout({
         <div className="text-center max-w-md p-8">
           <h1 className="text-2xl font-bold text-red-600 mb-4">Access Denied</h1>
           <p className="text-gray-600 mb-4">
-            You don't have permission to access the admin dashboard.
+            You don&apos;t have permission to access the admin dashboard.
           </p>
           <Link href="/" className="text-blue-500 hover:underline">
             Return to homepage
@@ -43,6 +43,7 @@ export default function AdminLayout({
 
   const navItems = [
     { href: '/admin', label: 'Dashboard', icon: '📊' },
+    { href: '/admin/decisions', label: 'Decisions', icon: '✉️' },
     { href: '/admin/cities', label: 'Cities', icon: '🏙️' },
     { href: '/admin/contacts', label: 'Contacts', icon: '👥' },
     { href: '/admin/events', label: 'Events', icon: '📅' },

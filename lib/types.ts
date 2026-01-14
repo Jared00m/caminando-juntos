@@ -65,6 +65,15 @@ export interface StudyProgress {
   completed_at: string
 }
 
+export interface GospelDecision {
+  id: number
+  name: string
+  email: string
+  locale?: string | null
+  page_path?: string | null
+  created_at: string
+}
+
 export interface FeatureFlag {
   key: string
   enabled: boolean

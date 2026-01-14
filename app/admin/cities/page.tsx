@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { createClient } from '@/lib/supabase-browser'
 import { City, Region } from '@/lib/types'
 
@@ -10,13 +10,9 @@ export default function CitiesAdmin() {
   const [loading, setLoading] = useState(true)
   const [newCityName, setNewCityName] = useState('')
   const [selectedCountry, setSelectedCountry] = useState('')
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
-  useEffect(() => {
-    fetchData()
-  }, [])
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true)
       console.log('Fetching regions...')
@@ -34,7 +30,11 @@ export default function CitiesAdmin() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [supabase])
+
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
 
   const handleAddCity = async (e: React.FormEvent) => {
     e.preventDefault()

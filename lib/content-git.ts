@@ -2,29 +2,40 @@ import fs from 'fs/promises'
 import path from 'path'
 import matter from 'gray-matter'
 import { compile } from '@mdx-js/mdx'
-import { Article, Video, StudyContent, ContentFrontmatter, StudyMetadata, LessonFrontmatter } from './types'
+import { Article, Video, StudyContent, StudyMetadata, LessonFrontmatter } from './types'
 
 const CONTENT_DIR = path.join(process.cwd(), 'content')
+
+function normalizeTag(tag: string): string {
+  return (tag || '')
+    .toString()
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+}
 
 function normalizeLocale(locale: string): 'es' | 'pt' {
   return locale === 'pt' ? 'pt' : 'es'
 }
 
-function validateStudyMetadata(meta: any): StudyMetadata {
-  const safeString = (v: any, fallback = '') => (typeof v === 'string' ? v : fallback)
-  const safeNumber = (v: any) => (typeof v === 'number' ? v : undefined)
-  const safeStringArray = (v: any) => (Array.isArray(v) ? v.filter((x) => typeof x === 'string') : undefined)
+function validateStudyMetadata(meta: unknown): StudyMetadata {
+  const safeString = (v: unknown, fallback = '') => (typeof v === 'string' ? v : fallback)
+  const safeNumber = (v: unknown) => (typeof v === 'number' ? v : undefined)
+  const safeStringArray = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : undefined)
+
+  const m: Record<string, unknown> = typeof meta === 'object' && meta !== null ? (meta as Record<string, unknown>) : {}
 
   const validated: StudyMetadata = {
-    title: safeString(meta?.title),
-    slug: safeString(meta?.slug),
-    description: safeString(meta?.description),
-    level: safeString(meta?.level) || undefined,
-    lessons: safeNumber(meta?.lessons),
-    estimatedTime: safeString(meta?.estimatedTime) || undefined,
-    tags: safeStringArray(meta?.tags),
-    thumbnail: safeString(meta?.thumbnail) || undefined,
-    order: safeNumber(meta?.order),
+    title: safeString(m.title),
+    slug: safeString(m.slug),
+    description: safeString(m.description),
+    level: safeString(m.level) || undefined,
+    lessons: safeNumber(m.lessons),
+    estimatedTime: safeString(m.estimatedTime) || undefined,
+    tags: safeStringArray(m.tags),
+    thumbnail: safeString(m.thumbnail) || undefined,
+    order: safeNumber(m.order),
   }
 
   if (!validated.title || !validated.slug || !validated.description) {
@@ -33,22 +44,24 @@ function validateStudyMetadata(meta: any): StudyMetadata {
   return validated
 }
 
-function validateLessonFrontmatter(data: any, lessonPath: string): LessonFrontmatter {
-  const safeString = (v: any, fallback = '') => (typeof v === 'string' ? v : fallback)
-  const safeNumber = (v: any) => (typeof v === 'number' ? v : undefined)
-  const safeStringArray = (v: any) => (Array.isArray(v) ? v.filter((x) => typeof x === 'string') : undefined)
+function validateLessonFrontmatter(data: unknown, lessonPath: string): LessonFrontmatter {
+  const safeString = (v: unknown, fallback = '') => (typeof v === 'string' ? v : fallback)
+  const safeNumber = (v: unknown) => (typeof v === 'number' ? v : undefined)
+  const safeStringArray = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : undefined)
+
+  const d: Record<string, unknown> = typeof data === 'object' && data !== null ? (data as Record<string, unknown>) : {}
 
   const validated: LessonFrontmatter = {
-    title: safeString(data?.title),
-    date: safeString(data?.date),
-    order: safeNumber(data?.order) || 0,
-    description: safeString(data?.description),
-    tags: safeStringArray(data?.tags),
-    steps: safeNumber(data?.steps),
-    episode: safeNumber(data?.episode),
-    author: safeString(data?.author) || undefined,
-    duration: safeString(data?.duration) || undefined,
-    cover: safeString(data?.cover) || undefined,
+    title: safeString(d.title),
+    date: safeString(d.date),
+    order: safeNumber(d.order) || 0,
+    description: safeString(d.description),
+    tags: safeStringArray(d.tags),
+    steps: safeNumber(d.steps),
+    episode: safeNumber(d.episode),
+    author: safeString(d.author) || undefined,
+    duration: safeString(d.duration) || undefined,
+    cover: safeString(d.cover) || undefined,
   }
 
   // Validate required fields
@@ -85,7 +98,7 @@ export async function getArticles(locale: string = 'es'): Promise<Article[]> {
           try {
             await fs.access(path.join(articlesDir, localizedFile))
             filename = localizedFile
-          } catch (e) {
+          } catch {
             // Fallback to default
           }
         }
@@ -111,6 +124,20 @@ export async function getArticles(locale: string = 'es'): Promise<Article[]> {
 }
 
 /**
+ * Get all articles that match a specific tag (case + accent insensitive)
+ */
+export async function getArticlesByTag(tag: string, locale: string = 'es'): Promise<Article[]> {
+  const articles = await getArticles(locale)
+  const target = normalizeTag(tag)
+  if (!target) return []
+
+  return articles.filter((article) => {
+    const tags = Array.isArray(article.tags) ? article.tags : []
+    return tags.some((t) => normalizeTag(t) === target)
+  })
+}
+
+/**
  * Get a single article by slug
  */
 export async function getArticle(slug: string, locale: string = 'es'): Promise<Article | null> {
@@ -123,7 +150,7 @@ export async function getArticle(slug: string, locale: string = 'es'): Promise<A
       try {
         await fs.access(path.join(articlesDir, localizedFile))
         filename = localizedFile
-      } catch (e) {
+      } catch {
         // Fallback to default
       }
     }
@@ -163,7 +190,7 @@ export async function getVideos(locale: string = 'es'): Promise<Video[]> {
           try {
             await fs.access(path.join(videosDir, localizedFile))
             filename = localizedFile
-          } catch (e) {
+          } catch {
             // Fallback to default
           }
         }
@@ -201,7 +228,7 @@ export async function getVideo(slug: string, locale: string = 'es'): Promise<Vid
       try {
         await fs.access(path.join(videosDir, localizedFile))
         filename = localizedFile
-      } catch (e) {
+      } catch {
         // Fallback to default
       }
     }
@@ -250,7 +277,7 @@ export async function getStudyMetadata(study: string, locale: string = 'es'): Pr
       try {
         await fs.access(path.join(studyDir, localizedFile))
         filename = localizedFile
-      } catch (e) {
+      } catch {
         // Fallback
       }
     }
@@ -310,7 +337,7 @@ export async function getStudyLessons(study: string, locale: string = 'es'): Pro
           try {
             await fs.access(path.join(studyDir, localizedFile))
             filename = localizedFile
-          } catch (e) {
+          } catch {
             // Fallback
           }
         }
@@ -351,7 +378,7 @@ export async function getStudyLesson(study: string, lesson: string, locale: stri
       try {
         await fs.access(path.join(studyDir, localizedFile))
         filename = localizedFile
-      } catch (e) {
+      } catch {
         // Fallback
       }
     }

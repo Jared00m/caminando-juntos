@@ -2,8 +2,8 @@ import { getFeatureFlags } from './supabase-server'
 import { FeatureFlag } from './types'
 
 // In-memory cache for feature flags
-let flagsCache: Map<string, FeatureFlag[]> = new Map()
-let lastFetchTime: Map<string, number> = new Map()
+const flagsCache: Map<string, FeatureFlag[]> = new Map()
+const lastFetchTime: Map<string, number> = new Map()
 
 const CACHE_DURATION = parseInt(process.env.FEATURE_FLAGS_CACHE_SECONDS || '300') * 1000 // Convert to milliseconds
 
