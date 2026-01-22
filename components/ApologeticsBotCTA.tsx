@@ -1,20 +1,6 @@
 'use client'
 
-import { useCallback } from 'react'
-import { useRouter } from 'next/navigation'
-
 export function ApologeticsBotCTA() {
-  const router = useRouter()
-
-  const openChat = useCallback(() => {
-    if (typeof window !== 'undefined' && window.$chatwoot?.toggle) {
-      window.$chatwoot.toggle()
-      return
-    }
-
-    router.push('/comunidad/chat')
-  }, [router])
-
   return (
     <section className="bg-[#f7f9fc] py-16 px-4">
       <div className="container mx-auto">
@@ -28,13 +14,9 @@ export function ApologeticsBotCTA() {
               Pregúntale a nuestro bot de apologética. Puedes escribir tu pregunta y te responderemos con respeto, claridad y referencias bíblicas cuando sea posible.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                type="button"
-                onClick={openChat}
-                className="bg-white text-[#1E88E5] hover:bg-gray-100 px-8 py-3 rounded-lg font-semibold transition-colors"
-              >
-                Preguntar ahora
-              </button>
+              <a href = "/bot-de-fe"
+                className="bg-white text-[#1E88E5] hover:bg-gray-100 px-8 py-3 rounded-lg font-semibold transition-colors inline-block"
+              > Preguntar ahora </a>
               <a
                 href="/comunidad/chat"
                 className="bg-transparent border-2 border-white text-white hover:bg-white/10 px-8 py-3 rounded-lg font-semibold transition-colors inline-block"

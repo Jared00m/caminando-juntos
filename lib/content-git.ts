@@ -6,6 +6,17 @@ import { Article, Video, StudyContent, StudyMetadata, LessonFrontmatter } from '
 
 const CONTENT_DIR = path.join(process.cwd(), 'content')
 
+function isSafePathSegment(value: string): boolean {
+  if (typeof value !== 'string') return false
+  const v = value.trim()
+  if (!v) return false
+  if (v.includes('/') || v.includes('\\') || v.includes('\0')) return false
+  if (v === '.' || v === '..') return false
+  if (v.includes('..')) return false
+  // Allow common slug patterns.
+  return /^[a-z0-9][a-z0-9-_]*$/i.test(v)
+}
+
 function normalizeTag(tag: string): string {
   return (tag || '')
     .toString()
@@ -142,6 +153,10 @@ export async function getArticlesByTag(tag: string, locale: string = 'es'): Prom
  */
 export async function getArticle(slug: string, locale: string = 'es'): Promise<Article | null> {
   try {
+    if (!isSafePathSegment(slug)) {
+      console.warn('Rejected unsafe article slug:', slug)
+      return null
+    }
     const articlesDir = path.join(CONTENT_DIR, 'articulos')
     let filename = `${slug}.mdx`
     
@@ -220,6 +235,10 @@ export async function getVideos(locale: string = 'es'): Promise<Video[]> {
  */
 export async function getVideo(slug: string, locale: string = 'es'): Promise<Video | null> {
   try {
+    if (!isSafePathSegment(slug)) {
+      console.warn('Rejected unsafe video slug:', slug)
+      return null
+    }
     const videosDir = path.join(CONTENT_DIR, 'videos')
     let filename = `${slug}.mdx`
     
@@ -269,6 +288,10 @@ export async function getStudies(): Promise<string[]> {
  */
 export async function getStudyMetadata(study: string, locale: string = 'es'): Promise<StudyMetadata | null> {
   try {
+    if (!isSafePathSegment(study)) {
+      console.warn('Rejected unsafe study slug:', study)
+      return null
+    }
     const studyDir = path.join(CONTENT_DIR, 'estudios', study)
     let filename = 'index.json'
     const loc = normalizeLocale(locale)
@@ -321,6 +344,10 @@ export async function getStudiesWithMetadata(locale: string = 'es'): Promise<Stu
  */
 export async function getStudyLessons(study: string, locale: string = 'es'): Promise<StudyContent[]> {
   try {
+    if (!isSafePathSegment(study)) {
+      console.warn('Rejected unsafe study slug:', study)
+      return []
+    }
     const studyDir = path.join(CONTENT_DIR, 'estudios', study)
     const files = await fs.readdir(studyDir)
     // Filter for default locale files to get the base list
@@ -370,6 +397,10 @@ export async function getStudyLessons(study: string, locale: string = 'es'): Pro
  */
 export async function getStudyLesson(study: string, lesson: string, locale: string = 'es'): Promise<StudyContent | null> {
   try {
+    if (!isSafePathSegment(study) || !isSafePathSegment(lesson)) {
+      console.warn('Rejected unsafe study/lesson slug:', { study, lesson })
+      return null
+    }
     const studyDir = path.join(CONTENT_DIR, 'estudios', study)
     let filename = `${lesson}.mdx`
     

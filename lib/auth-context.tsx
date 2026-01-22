@@ -12,6 +12,7 @@ interface AuthContextType {
   isAuthenticated: boolean
   isAdmin: boolean
   isLoading: boolean
+  accessToken: string | null
   signIn: (email: string, password: string) => Promise<void>
   signUp: (email: string, password: string, displayName?: string) => Promise<void>
   signOut: () => Promise<void>
@@ -23,6 +24,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isAdmin, setIsAdmin] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [accessToken, setAccessToken] = useState<string | null>(null)
   const supabase = useMemo(() => createClient(), [])
 
   // Get or create anonymous ID
@@ -76,6 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!isMounted) return
 
         setUser(session?.user ?? null)
+        setAccessToken(session?.access_token ?? null)
         await checkAdmin(session?.user ?? null)
       } catch (err) {
         console.error('Error initializing session:', err)
@@ -94,6 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!isMounted) return
 
       setUser(session?.user ?? null)
+      setAccessToken(session?.access_token ?? null)
       
       // Defer the admin check to avoid deadlock in the auth callback
       Promise.resolve().then(() => {
@@ -139,6 +143,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setUser(null)
       setIsAdmin(false)
+      setAccessToken(null)
     } finally {
       setIsLoading(false)
     }
@@ -152,6 +157,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated,
         isAdmin,
         isLoading,
+        accessToken,
         signIn,
         signUp,
         signOut,

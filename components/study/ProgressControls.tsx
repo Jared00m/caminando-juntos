@@ -10,7 +10,7 @@ interface ProgressControlsProps {
 }
 
 export function ProgressControls({ step, studyId, lessonId }: ProgressControlsProps) {
-  const { userId, isAuthenticated } = useAuth()
+  const { userId, isAuthenticated, accessToken } = useAuth()
   const [isCompleted, setIsCompleted] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -26,13 +26,15 @@ export function ProgressControls({ step, studyId, lessonId }: ProgressControlsPr
         step: step.toString(),
       })
 
-      const response = await fetch(`/api/study-progress?${params}`)
+      const response = await fetch(`/api/study-progress?${params}` , {
+        headers: isAuthenticated && accessToken ? { authorization: `Bearer ${accessToken}` } : undefined,
+      })
       const data = await response.json()
       setIsCompleted(data.completed)
     } catch (error) {
       console.error('Error checking progress:', error)
     }
-  }, [isAuthenticated, lessonId, step, studyId, userId])
+  }, [accessToken, isAuthenticated, lessonId, step, studyId, userId])
 
   useEffect(() => {
     checkProgress()
@@ -47,6 +49,7 @@ export function ProgressControls({ step, studyId, lessonId }: ProgressControlsPr
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(isAuthenticated && accessToken ? { authorization: `Bearer ${accessToken}` } : {}),
         },
         body: JSON.stringify({
           userId,

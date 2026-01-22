@@ -99,8 +99,14 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 SUPABASE_ASSETS_BUCKET=content-assets
 
 # Chatwoot
-CHATWOOT_TOKEN=your-chatwoot-token
-CHATWOOT_BASE_URL=https://chat.yourdomain.org
+NEXT_PUBLIC_CHATWOOT_BASE_URL=https://chat.yourdomain.org
+
+# Default (general) inbox
+NEXT_PUBLIC_CHATWOOT_TOKEN_DEFAULT=your-chatwoot-token
+
+# Optional: per-country inbox tokens (JSON)
+# Example: {"PE":"token-for-peru","MX":"token-for-mexico"}
+NEXT_PUBLIC_CHATWOOT_TOKENS_BY_COUNTRY=
 
 # Chipp (Bot de Fe)
 CHIPP_API_KEY=your-chipp-api-key
