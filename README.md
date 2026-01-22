@@ -102,6 +102,9 @@ SUPABASE_ASSETS_BUCKET=content-assets
 CHATWOOT_TOKEN=your-chatwoot-token
 CHATWOOT_BASE_URL=https://chat.yourdomain.org
 
+# Chipp (Bot de Fe)
+CHIPP_API_KEY=your-chipp-api-key
+
 # Feature Flags
 FEATURE_FLAGS_CACHE_SECONDS=300
 ```
