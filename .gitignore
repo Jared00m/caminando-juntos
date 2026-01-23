@@ -28,6 +28,10 @@ yarn-error.log*
 # local env files
 .env*.local
 .env
+
+# environment files (keep secrets out of git)
+.env.production
+.env.development
 .env.production
 
 # vercel
