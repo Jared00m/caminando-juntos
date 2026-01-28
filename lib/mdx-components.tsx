@@ -1,6 +1,7 @@
 import React from 'react'
 import { usePathname } from 'next/navigation'
 import { ProgressControls } from '@/components/study/ProgressControls'
+import { Hero } from '@/components/Hero'
 
 type PropsWithChildren = { children?: React.ReactNode }
 
@@ -147,6 +148,7 @@ function YouTube({ id, title, caption }: { id: string; title?: string; caption?:
 
 export const mdxComponents = {
   // Custom study components (can be used in MDX as <Step>, <Section>, etc.)
+  Hero,
   Step,
   DevotionalLesson,
   Section,

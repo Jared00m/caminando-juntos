@@ -92,6 +92,7 @@ export interface ContentFrontmatter {
   author?: string
   duration?: string
   youtube_id?: string
+  audio_url?: string
 }
 
 export interface Article extends ContentFrontmatter {
@@ -100,6 +101,12 @@ export interface Article extends ContentFrontmatter {
 }
 
 export interface Video extends ContentFrontmatter {
+  slug: string
+  content: string
+  youtube_id: string
+}
+
+export interface Testimony extends ContentFrontmatter {
   slug: string
   content: string
   youtube_id: string

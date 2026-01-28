@@ -2,7 +2,7 @@ import fs from 'fs/promises'
 import path from 'path'
 import matter from 'gray-matter'
 import { compile } from '@mdx-js/mdx'
-import { Article, Video, StudyContent, StudyMetadata, LessonFrontmatter } from './types'
+import { Article, Video, Testimony, StudyContent, StudyMetadata, LessonFrontmatter } from './types'
 
 const CONTENT_DIR = path.join(process.cwd(), 'content')
 
@@ -227,6 +227,87 @@ export async function getVideos(locale: string = 'es'): Promise<Video[]> {
   } catch (error) {
     console.error('Error reading videos:', error)
     return []
+  }
+}
+
+/**
+ * Get all testimonies from the content directory
+ */
+export async function getTestimonies(locale: string = 'es'): Promise<Testimony[]> {
+  try {
+    const testimoniesDir = path.join(CONTENT_DIR, 'testimonios')
+    const files = await fs.readdir(testimoniesDir)
+    // Filter for default locale files to get the base list
+    const mdxFiles = files.filter((file) => file.endsWith('.mdx') && !file.includes('.pt.mdx'))
+
+    const testimonies = await Promise.all(
+      mdxFiles.map(async (file) => {
+        const slug = file.replace('.mdx', '')
+        let filename = file
+
+        if (locale !== 'es') {
+          const localizedFile = `${slug}.${locale}.mdx`
+          try {
+            await fs.access(path.join(testimoniesDir, localizedFile))
+            filename = localizedFile
+          } catch {
+            // Fallback to default
+          }
+        }
+
+        const fullPath = path.join(testimoniesDir, filename)
+        const fileContent = await fs.readFile(fullPath, 'utf8')
+        const { data, content } = matter(fileContent)
+
+        return {
+          slug,
+          content,
+          ...data,
+        } as Testimony
+      })
+    )
+
+    return testimonies.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  } catch (error) {
+    console.error('Error reading testimonies:', error)
+    return []
+  }
+}
+
+/**
+ * Get a single testimony by slug
+ */
+export async function getTestimony(slug: string, locale: string = 'es'): Promise<Testimony | null> {
+  try {
+    if (!isSafePathSegment(slug)) {
+      console.warn('Rejected unsafe testimony slug:', slug)
+      return null
+    }
+    const testimoniesDir = path.join(CONTENT_DIR, 'testimonios')
+    let filename = `${slug}.mdx`
+
+    if (locale !== 'es') {
+      const localizedFile = `${slug}.${locale}.mdx`
+      try {
+        await fs.access(path.join(testimoniesDir, localizedFile))
+        filename = localizedFile
+      } catch {
+        // Fallback to default
+      }
+    }
+
+    const filePath = path.join(testimoniesDir, filename)
+    const fileContent = await fs.readFile(filePath, 'utf8')
+    const { data, content } = matter(fileContent)
+
+    return {
+      slug,
+      content,
+      ...data,
+    } as Testimony
+  } catch (error) {
+    console.error(`Error reading testimony ${slug}:`, error)
+    return null
   }
 }
 

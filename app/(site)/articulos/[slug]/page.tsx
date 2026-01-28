@@ -6,6 +6,9 @@ import { ArticleStructuredData, BreadcrumbStructuredData } from '@/components/St
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 import Image from 'next/image'
+import { Hero } from '@/components/Hero'
+import { YouTube } from '@/components/YouTube'
+import { defaultLocale, getDictionary, type Locale } from '@/lib/i18n'
 
 interface ArticlePageProps {
   params: Promise<{
@@ -16,20 +19,23 @@ interface ArticlePageProps {
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
   const { slug } = await params
   const cookieStore = await cookies()
-  const locale = cookieStore.get('NEXT_LOCALE')?.value || 'es'
+  const locale = (cookieStore.get('NEXT_LOCALE')?.value as Locale) || defaultLocale
+  const dictionary = getDictionary(locale)
   const article = await getArticle(slug, locale)
 
   if (!article) {
     return {
-      title: 'Artículo no encontrado',
+      title: dictionary.articlePage.notFoundTitle,
     }
   }
 
+  const fallbackDescription = dictionary.articlePage.defaultDescription.replace('{title}', article.title)
+
   return {
     title: `${article.title} | Caminando Juntos`,
-    description: article.description || `Lee ${article.title} en Caminando Juntos - artículos que inspiran fe.`,
-    keywords: article.tags || ['artículo cristiano', 'fe', 'evangelio'],
-    authors: article.author ? [{ name: article.author }] : [{ name: 'Caminando Juntos' }],
+    description: article.description || fallbackDescription,
+    keywords: article.tags || [...dictionary.articlePage.defaultKeywords],
+    authors: article.author ? [{ name: article.author }] : [{ name: dictionary.articlePage.defaultAuthor }],
     openGraph: {
       type: 'article',
       locale: locale === 'pt' ? 'pt_BR' : 'es_ES',
@@ -38,7 +44,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
       description: article.description || '',
       siteName: 'Caminando Juntos',
       publishedTime: article.date,
-      authors: article.author ? [article.author] : ['Caminando Juntos'],
+      authors: article.author ? [article.author] : [dictionary.articlePage.defaultAuthor],
       tags: article.tags,
       images: article.cover ? [{
         url: article.cover,
@@ -62,7 +68,8 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { slug } = await params
   const cookieStore = await cookies()
-  const locale = cookieStore.get('NEXT_LOCALE')?.value || 'es'
+  const locale = (cookieStore.get('NEXT_LOCALE')?.value as Locale) || defaultLocale
+  const dictionary = getDictionary(locale)
   const article = await getArticle(slug, locale)
 
   if (!article) {
@@ -70,27 +77,36 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="w-full">
       <ArticleStructuredData
         title={article.title}
         description={article.description || ''}
         datePublished={article.date}
-        author={article.author || 'Caminando Juntos'}
+        author={article.author || dictionary.articlePage.defaultAuthor}
         image={article.cover}
         url={`https://cjuntos.org/articulos/${slug}`}
       />
       <BreadcrumbStructuredData
         items={[
-          { name: 'Inicio', url: 'https://cjuntos.org' },
-          { name: 'Artículos', url: 'https://cjuntos.org/articulos' },
+          { name: dictionary.articlePage.breadcrumbs.home, url: 'https://cjuntos.org' },
+          { name: dictionary.articlePage.breadcrumbs.articles, url: 'https://cjuntos.org/articulos' },
           { name: article.title, url: `https://cjuntos.org/articulos/${slug}` },
         ]}
       />
-      <article className="max-w-4xl mx-auto">
-        {/* Header */}
-        <header className="mb-8">
-          {article.cover && (
-            <div className="relative aspect-video mb-8 rounded-lg overflow-hidden">
+      <article className="w-full">
+        <Hero
+          title={article.title}
+          subtitle={article.description}
+          variant="default"
+        />
+
+        <div className="container mx-auto px-4 max-w-4xl">
+          {article.youtube_id ? (
+            <div className="my-8">
+              <YouTube id={article.youtube_id} title={article.title} />
+            </div>
+          ) : article.cover ? (
+            <div className="relative aspect-video my-8 rounded-lg overflow-hidden">
               <Image
                 src={article.cover}
                 alt={article.title}
@@ -99,68 +115,39 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                 className="object-cover"
               />
             </div>
-          )}
-          
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">{article.title}</h1>
-          
-          {article.description && (
-            <p className="text-xl text-muted-foreground mb-6">{article.description}</p>
-          )}
-          
-          <div className="flex items-center justify-between border-b pb-6">
-            <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-              <span>{new Date(article.date).toLocaleDateString('es-ES', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}</span>
-              {article.author && <span>por {article.author}</span>}
+          ) : null}
+
+          {article.audio_url && (
+            <div className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+              <p className="text-sm font-semibold text-gray-900 mb-2">{dictionary.articlePage.audioLabel}</p>
+              <audio controls className="w-full">
+                <source src={article.audio_url} />
+                {dictionary.articlePage.audioUnsupported}
+              </audio>
             </div>
-            
-            {article.tags && article.tags.length > 0 && (
-              <div className="flex gap-2">
-                {article.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
+          )}
+
+          {/* Content */}
+          <div className="prose prose-lg max-w-none">
+            <MDXRenderer content={article.content} />
           </div>
-        </header>
 
-        {/* Content */}
-        <div className="prose prose-lg max-w-none">
-          <MDXRenderer content={article.content} />
-        </div>
-
-        {/* Footer */}
-        <footer className="mt-12 pt-8 border-t">
-          <div className="flex items-center justify-between">
-            <Link
-              href="/articulos"
-              className="inline-flex items-center text-primary hover:text-primary/80"
-            >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Volver a artículos
-            </Link>
-            
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-muted-foreground">¿Te gustó este artículo?</span>
+          {/* Footer */}
+          <footer className="mt-12 py-8 border-t">
+            <div className="flex items-center justify-between">
               <Link
-                href="/estudios"
-                className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                href="/articulos"
+                className="inline-flex items-center text-primary hover:text-primary/80"
               >
-                Continúa con estudios
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                {dictionary.articlePage.backToArticles}
               </Link>
+              
             </div>
-          </div>
-        </footer>
+          </footer>
+        </div>
       </article>
     </div>
   )

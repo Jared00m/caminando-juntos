@@ -28,6 +28,8 @@ const nextConfig = {
     '/articulos/[slug]': ['./content/articulos/**/*'],
     '/videos': ['./content/videos/**/*'],
     '/videos/[slug]': ['./content/videos/**/*'],
+    '/comienza-aqui/testimonios': ['./content/testimonios/**/*'],
+    '/comienza-aqui/testimonios/[slug]': ['./content/testimonios/**/*'],
   },
 
   // Prevent Next from inferring a parent folder as the workspace root
