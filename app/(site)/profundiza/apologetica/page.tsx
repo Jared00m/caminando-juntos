@@ -12,7 +12,7 @@ export default async function ApologeticsPage() {
 
   return (
     <div className="container mx-auto px-4 py-12">
-      <div className="mx-auto mb-10 max-w-4xl">
+      <div className="mx-auto mb-10">
         <h1 className="text-5xl font-bold mb-4 text-deep-indigo">Apologética</h1>
         <p className="text-xl text-muted-foreground leading-relaxed">
           Respuestas claras a preguntas difíciles sobre la fe cristiana. Esta página muestra todos los artículos etiquetados con “apologética”.
